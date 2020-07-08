@@ -81,3 +81,61 @@ def signup():
             return ("Method Not Allowed", 405)
     except:
         return ("internal server error - data issue", 500)
+
+@app.route('/recipes/new-recipe', methods = ['POST'])
+def signup():
+    try:
+        if request.method == 'POST':
+            data = request.get_json()
+            result = cql.create_recipe(session=sesh,title=data["title"],name=data["name"],description=data["bio"],image=data["image"],tags=data["tags"],chefid=data["chefid"],instructions=data["instructions"],minutes=data["minutes"])
+            if result:
+                return result
+            else:
+                return ("Internal server error when creating recipe in database",401)
+        else:
+            return ("Method Not Allowed", 405)
+    except:
+        return ("internal server error - data issue", 500)
+
+@app.route('/recipes/browse/<recipe_id>', methods = ['GET', 'POST', 'DELETE'])
+def recipe(recipe_id):
+    try:
+        if request.method == 'GET':
+            result = cql.get_recipe(session=sesh,id=recipe_id)
+            if result:
+                return result
+            else:
+                return ("chef not found",404)
+
+        if request.method == 'POST':
+            data = request.get_json()
+            result = cql.update_recipe(session=sesh,id=data["id"],title=data["title"],name=data["name"],description=data["bio"],image=data["image"],tags=data["tags"],chefid=data["chefid"],instructions=data["instructions"],minutes=data["minutes"])
+            if result:
+                return "user updated"
+            else:
+                return ("chef not found",404)
+
+        if request.method == 'DELETE':
+            cql.delete_chef(session=sesh,id=user_id)
+            return "user deleted"
+
+        else:
+            return ("Method Not Allowed", 405)
+
+    except:
+        return ("internal server error - data issue", 500)
+
+@app.route('/recipes/browse', methods = ['GET'])
+def browse():
+    try:
+        if request.method == 'GET':
+            data = request.get_json()
+            result = cql.create_chef(session=sesh,searchterms=data["searchterms"],tags=data["tags"],chefid=data["chefid"])
+            if result:
+                return result
+            else:
+                return ("username taken",401)
+        else:
+            return ("Method Not Allowed", 405)
+    except:
+        return ("internal server error - data issue", 500)
