@@ -1,4 +1,4 @@
-Test_Database/
+Test_Database/*
 *.log
 /node_modules
 /.pnp
@@ -24,3 +24,4 @@ Test_Database/data/commitlog/CommitLog-6-1593896683463.log
 Test_Database/logs/debug.log
 Test_Database/logs/gc.log.0.current
 Test_Database/logs/system.log
+*.DS_Store
