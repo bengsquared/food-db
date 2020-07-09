@@ -27,3 +27,4 @@ Test_Database/logs/system.log
 *.DS_Store
 Test_Database/
 Test_Database/*
+*.pyc
