@@ -131,7 +131,7 @@ def search_recipes(session,searchterms,chefid,tags):
     for tag in tags
         filterstring=filterstring + " or tags contains '" + tag + "'"
         rankstring=rankstring + " + case when tags contains '" + tag + "' then 1 else 0 end"
-    
+
     res=session.execute("""
         select id, title, description,minutes,image,tags
         from recipe

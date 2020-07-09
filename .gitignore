@@ -25,3 +25,5 @@ Test_Database/logs/debug.log
 Test_Database/logs/gc.log.0.current
 Test_Database/logs/system.log
 *.DS_Store
+*.log
+Test_Database/logs/debug.log
