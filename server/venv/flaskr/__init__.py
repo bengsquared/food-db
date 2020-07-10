@@ -8,7 +8,7 @@ from cassandra.policies import WhiteListRoundRobinPolicy, DowngradingConsistency
 from cassandra.query import dict_factory
 
 profile = ExecutionProfile(
-    load_balancing_policy=WhiteListRoundRobinPolicy(['192.168.1.23']),
+    load_balancing_policy=WhiteListRoundRobinPolicy(['127.0.0.1']),
     request_timeout=15,
     row_factory=dict_factory
 )

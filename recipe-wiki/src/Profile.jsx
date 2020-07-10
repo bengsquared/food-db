@@ -99,16 +99,17 @@ const Profile = ({ onSave, user }) => {
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "name") {
+    if (e.target.getAttribute("name") === "name") {
       setChef({ ...chef, name: e.target.value });
-    } else if (e.target.name === "bio") {
+    } else if (e.target.getAttribute("name") === "bio") {
       setChef({ ...chef, bio: e.target.value });
     }
     e.preventDefault();
   };
 
   const saveProfile = () => {
-    userUpdate(user, onSave);
+    userUpdate(chef, onSave);
+    setEditing(false);
   };
 
   return editing ? (
@@ -116,37 +117,37 @@ const Profile = ({ onSave, user }) => {
       <ul>
         <li>username: {user.username}</li>
         <li>
-          <label>name:</label>
+          <label>name: </label>
           <input
             id="name"
             name="name"
-            value={user.name}
+            value={chef.name}
             onChange={handleChange}
           />
         </li>
 
         <li>
-          <label>bio:</label>
+          <label>bio: </label>
           <input
             id="bio"
             name="bio"
             required
             size="10"
-            value={user.bio}
+            value={chef.bio}
             onChange={handleChange}
           />
         </li>
       </ul>
       <button name="save" onClick={saveProfile}>
-        edit
+        save
       </button>
     </div>
   ) : (
     <div id="profile">
       <ul>
-        <li>username:{user.username}</li>
-        <li>name:{user.name}</li>
-        <li>bio:{user.bio}</li>
+        <li>username: {user.username}</li>
+        <li>name: {chef.name}</li>
+        <li>bio: {chef.bio}</li>
       </ul>
       <button name="edit" onClick={editProfile}>
         edit

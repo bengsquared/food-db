@@ -1,11 +1,14 @@
 import React from "react";
 import "./App.css";
 import Main from "./Main";
+import { CookiesProvider } from "react-cookie";
 
 const App = () => (
-  <div className="App">
-    <Main />
-  </div>
+  <CookiesProvider>
+    <div className="App">
+      <Main />
+    </div>
+  </CookiesProvider>
 );
 
 export default App;
