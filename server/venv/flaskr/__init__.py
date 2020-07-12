@@ -6,6 +6,7 @@ import SqlFunctions as cql
 from cassandra.cluster import Cluster, ExecutionProfile, EXEC_PROFILE_DEFAULT, ConsistencyLevel
 from cassandra.policies import WhiteListRoundRobinPolicy, DowngradingConsistencyRetryPolicy
 from cassandra.query import dict_factory
+import json
 
 profile = ExecutionProfile(
     load_balancing_policy=WhiteListRoundRobinPolicy(['127.0.0.1']),
@@ -83,11 +84,12 @@ def signup():
         return ("internal server error - data issue", 500)
 
 @app.route('/recipes/new-recipe', methods = ['POST'])
-def signup():
+def new_recipe():
     try:
         if request.method == 'POST':
             data = request.get_json()
-            result = cql.create_recipe(session=sesh,title=data["title"],name=data["name"],description=data["bio"],image=data["image"],tags=data["tags"],chefid=data["chefid"],instructions=data["instructions"],minutes=data["minutes"])
+            print(data["title"])
+            result = cql.create_recipe(session=sesh,title=data["title"],description=data["description"],image=data["image"],tags=data["tags"],chefid=data["chefid"],instructions=data["instructions"],minutes=data["minutes"])
             if result:
                 return result
             else:
@@ -103,39 +105,66 @@ def recipe(recipe_id):
         if request.method == 'GET':
             result = cql.get_recipe(session=sesh,id=recipe_id)
             if result:
-                return result
+                recipe={
+                    "id":result["id"],
+                    "title":result["title"]
+                    ,"tags":list(result["tags"] if result["tags"] is not None else []),
+                    "description":result["description"],
+                    "image":result["image"],
+                    "chefid":result["chefid"],
+                    "instructions":result["instructions"],
+                    "minutes":result["minutes"]
+                    }
+                return recipe
             else:
-                return ("chef not found",404)
+                return ("recipe not found",404)
 
         if request.method == 'POST':
+            print("called success")
             data = request.get_json()
-            result = cql.update_recipe(session=sesh,id=data["id"],title=data["title"],name=data["name"],description=data["bio"],image=data["image"],tags=data["tags"],chefid=data["chefid"],instructions=data["instructions"],minutes=data["minutes"])
+            print("data")
+            tagset=set(data["tags"])
+            result = cql.update_recipe(session=sesh,id=data["id"],title=data["title"],description=data["description"],image=data["image"],tags=tagset,instructions=data["instructions"],minutes=data["minutes"])
             if result:
-                return "user updated"
+                return "recipe updated"
             else:
-                return ("chef not found",404)
+                return ("recipe not found",404)
 
         if request.method == 'DELETE':
-            cql.delete_chef(session=sesh,id=user_id)
-            return "user deleted"
-
+            res=cql.delete_recipe(session=sesh,id=recipe_id)
+            print(res)
+            return "recipe deleted"
         else:
             return ("Method Not Allowed", 405)
 
     except:
+        raise
         return ("internal server error - data issue", 500)
 
 @app.route('/recipes/browse', methods = ['GET'])
 def browse():
     try:
         if request.method == 'GET':
-            data = request.get_json()
-            result = cql.create_chef(session=sesh,searchterms=data["searchterms"],tags=data["tags"],chefid=data["chefid"])
+            print(request.args.get("searchterms"))
+            result = cql.search_recipes(session=sesh,searchterms=request.args.get("searchterms"),tags=request.args.get("tags"),chefid=request.args.get("chefid"))
             if result:
-                return result
+                l=[]
+                for r in result:
+                    l.append({
+                        "id":r["id"],
+                        "title":r["title"],
+                        "tags": list(r["tags"] if r["tags"] is not None else []),
+                        "description":r["description"],
+                        "image":r["image"],
+                        "minutes":r["minutes"]
+                        })
+
+                return json.dumps(l)
+
             else:
-                return ("username taken",401)
+                return ("No Results",404)
         else:
             return ("Method Not Allowed", 405)
     except:
+        raise
         return ("internal server error - data issue", 500)

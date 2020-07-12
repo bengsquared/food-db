@@ -1,5 +1,9 @@
 @tailwind base;
 
+button:hover {
+  text-decoration: underline;
+}
+
 @tailwind components;
 
 @tailwind utilities;

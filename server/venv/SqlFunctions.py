@@ -1,6 +1,6 @@
 from cassandra.cluster import Cluster
+from fuzzywuzzy import fuzz
 import uuid
-
 
 def delete_chef(session,id):
     print(id)
@@ -80,8 +80,9 @@ def delete_recipe(session,id):
     return
 
 def get_recipe(session,id):
+    print("here1")
     res = session.execute("""
-        select * , WRITETIME(id)
+        select *
         from recipe
         where id = %s
         ;
@@ -93,19 +94,19 @@ def get_recipe(session,id):
     else:
         return False
 
+#dd2bd2b6-c250-11ea-88f5-f018986d7a1d
+#4508cd9e-c251-11ea-bd61-f018986d7a1d
 def create_recipe(session,chefid,title,description,instructions,minutes,image,tags):
-    res=session.execute("select count(username) as count from chef where username = %s;", (username,))
-    if res.one()["count"]>0:
-        return False
-    else:
-        newid = str(uuid.uuid1())
-        session.execute("""
-            insert into recipe (id,chefid,title,description,instructions,minutes,image,tags)
-            values(%s,%s,%s,%s,%s,%s,%s,%s)
-            ;
-            """, (newid,chefid,title,description,instructions,minutes,image,tags)
-        )
-        return newid
+    tags={l for l in tags}
+    print(tags)
+    newid = str(uuid.uuid1())
+    session.execute("""
+        insert into recipe (id,chefid,title,description,instructions,minutes,image,tags)
+        values(%s,%s,%s,%s,%s,%s,%s,%s)
+        ;
+        """, (newid,chefid,title,description,instructions,minutes,image,tags)
+    )
+    return newid
 
 def update_recipe(session,id,title,description,instructions,minutes,image,tags):
     res=session.execute("select count(id) as count from recipe where id = %s;", (id,))
@@ -126,32 +127,27 @@ def update_recipe(session,id,title,description,instructions,minutes,image,tags):
         return True
 
 def search_recipes(session,searchterms,chefid,tags):
-    let filterstring = ''
-    let rankstring = ''
-    for tag in tags
-        filterstring=filterstring + " or tags contains '" + tag + "'"
-        rankstring=rankstring + " + case when tags contains '" + tag + "' then 1 else 0 end"
 
     res=session.execute("""
         select id, title, description,minutes,image,tags
         from recipe
         where chefid = %(chefid)s
-        and ( title ~ %(searchterms)s
-            or description ~ %(searchterms)s
-            %(filterstring)s
-        )
-        order by (
-            case when title ~ %(searchterms)s then 2 else 0 end
-            + case when description ~ %(searchterms)s then 1 else 0 end
-            %(rankstring)s
-        ) desc
         ;
         """
-        , {'searchterms': searchterms,'filterstring': filterstring,'rankstring': rankstring,'chefid': chefid}
+        , {'chefid': chefid,}
+    ).all()
+    filteredres=list(filter(lambda row: ((fuzz.token_set_ratio(searchterms.lower(),row["title"].lower()) if searchterms.lower()!="" else 100)>80 or (fuzz.token_set_ratio(searchterms.lower(),row["description"].lower()) if searchterms.lower()!="" else 100)>80 or (len(row["tags"].intersection(tags)) if row["tags"] is not None and tags is not None else 0)>0),res))
+    return filteredres
+
+
+def delete_recipe(session,id):
+    res = session.execute("""
+        DELETE
+        from recipe
+        where id = %s
+        ;
+        """,
+        (id,)
     )
-    return
-
-
-def search_tags(session,tags):
-
+    print(res)
     return

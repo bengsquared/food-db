@@ -4,38 +4,13 @@ import Login from "./Login";
 import Profile from "./Profile";
 import Recipes from "./Recipes";
 import Header from "./Header";
+import "./assets/main.css";
+import "./assets/tailwind.css";
 
 import { useCookies } from "react-cookie";
 
-// export default class Main extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = { chef: null };
-//     this.set_user = this.set_user.bind(this);
-//   }
-
-//   set_user(user) {
-//     if (user instanceof Chef) {
-//       this.setState({ chef: user });
-//     }
-//   }
-
-//   render() {
-//     let result = <div>hii</div>;
-//     if (this.state.chef == null) {
-//       result = <Login onLogin={this.set_user} />;
-//     }
-
-//     if (this.state.chef instanceof Chef) {
-//       result = <Profile onSave={this.set_user} chef={this.state.chef} />;
-//     }
-
-//     return result;
-//   }
-// }
-
 const Main = () => {
-  const [cookies, setCookie] = useCookies(["chef"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["chef"]);
   let cookiechef = null;
   if (cookies.chef) {
     cookiechef = new Chef(
@@ -54,6 +29,11 @@ const Main = () => {
       setChef(user);
       setCookie("chef", user, { path: "/", maxAge: 1800 });
     }
+  };
+
+  const logout = () => {
+    removeCookie("chef");
+    setChef(null);
   };
 
   const setPage = (page) => {
@@ -84,8 +64,8 @@ const Main = () => {
   }
   if (chef instanceof Chef) {
     result = (
-      <div>
-        <Header setNav={setPage} />
+      <div className="bg-white h-screen">
+        <Header setNav={setPage} user={chef} logOut={logout} />
         <div>{content}</div>
       </div>
     );
