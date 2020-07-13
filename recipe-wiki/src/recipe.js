@@ -37,12 +37,8 @@ export const searchRecipes = (tags, searchterms, chefid, callback) => {
     method: "GET",
     data: data,
   };
-  console.log("ok1");
   ajax(settings).then(
     (res, textStatus, ok) => {
-      console.log("ok");
-      console.log(res);
-      console.log(textStatus);
       res = JSON.parse(res);
       let previews = res.map(
         (r) =>
@@ -63,14 +59,13 @@ export const searchRecipes = (tags, searchterms, chefid, callback) => {
       console.log(jqxhr);
       console.log(textStatus);
       console.log(errorthrown);
-      callback([]);
+      callback(["nothing"]);
     }
   );
 };
 
 export const getRecipe = (id, callback) => {
   const url = `${apiUrl}/recipes/browse/${id}`;
-  console.log(url);
   let settings = {
     async: true,
     type: "GET",
@@ -97,7 +92,6 @@ export const getRecipe = (id, callback) => {
 
 export const removeRecipe = (id, callback) => {
   const url = `${apiUrl}/recipes/browse/${id}`;
-  console.log(url);
   let settings = {
     async: true,
     type: "DELETE",
@@ -127,18 +121,12 @@ export const updateRecipe = (recipe, success) => {
     },
     data: JSON.stringify(data),
   };
-  console.log(settings);
   ajax(settings).then(
     (res, textStatus, ok) => {
-      console.log("ok");
-      console.log(res);
       success(recipe);
     },
     (jqxhr, textStatus, errorthrown) => {
-      console.log("got an error");
-      console.log(jqxhr);
-      console.log(textStatus);
-      console.log(errorthrown);
+      alert(errorthrown);
     }
   );
 };
@@ -158,16 +146,60 @@ export const createRecipe = (recipe, success) => {
     },
     data: JSON.stringify(data),
   };
-  console.log(settings);
   ajax(settings).then(
     (res, textStatus, ok) => {
-      console.log("ok");
-      console.log(res);
       success(recipe);
     },
     (jqxhr, textStatus, errorthrown) => {
-      console.log("got an error");
       alert(errorthrown + " " + textStatus);
     }
   );
 };
+
+export const foodemoji = [
+  "🥐",
+  "🥯",
+  "🥖",
+  "🥨",
+  "🍳",
+  "🍔",
+  "🌭",
+  "🍕",
+  "🥪",
+  "🥙",
+  "🥗",
+  "🌯",
+  "🌮",
+  "🧆",
+  "🥘",
+  "🍝",
+  "🍜",
+  "🍲",
+  "🥟",
+  "🍱",
+  "🍛",
+  "🍣",
+  "🍤",
+  "🍙",
+  "🍚",
+  "🍘",
+  "🥠",
+  "🍢",
+  "🍡",
+  "🍨",
+  "🍧",
+  "🍬",
+  "🍰",
+  "🥧",
+  "🧁",
+  "🎂",
+  "🍭",
+  "🍮",
+  "🍩",
+  "🍪",
+  "🍿",
+  "🍫",
+  "☕️",
+  "🍵",
+  "🧉",
+];

@@ -10,9 +10,9 @@ import "./assets/tailwind.css";
 import { useCookies } from "react-cookie";
 
 const Main = () => {
-  const [cookies, setCookie, removeCookie] = useCookies(["chef"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["chef"]["list"]);
   let cookiechef = null;
-  if (cookies.chef) {
+  if (cookies ? cookies.chef : false) {
     cookiechef = new Chef(
       cookies.chef.id,
       cookies.chef.username,
@@ -27,12 +27,14 @@ const Main = () => {
   const setUser = (user) => {
     if (user instanceof Chef) {
       setChef(user);
+      setCookie("list", [], { path: "/", maxAge: 1800 });
       setCookie("chef", user, { path: "/", maxAge: 1800 });
     }
+    console.log(cookies);
   };
 
   const logout = () => {
-    removeCookie("chef");
+    removeCookie("chesf");
     setChef(null);
   };
 
@@ -57,16 +59,36 @@ const Main = () => {
       content = <Profile onSave={setUser} user={chef} />;
       break;
     case "Recipes":
-      content = <Recipes user={chef} />;
+      content = (
+        <Recipes
+          user={chef}
+          cookies={cookies}
+          setCookie={setCookie}
+          removeCookie={removeCookie}
+        />
+      );
       break;
     default:
-      content = <Recipes user={chef} />;
+      content = (
+        <Recipes
+          user={chef}
+          cookies={cookies}
+          setCookie={setCookie}
+          removeCookie={removeCookie}
+        />
+      );
   }
   if (chef instanceof Chef) {
     result = (
-      <div className="bg-white h-screen">
-        <Header setNav={setPage} user={chef} logOut={logout} />
-        <div>{content}</div>
+      <div className="bg-white min-h-screen">
+        <Header
+          setNav={setPage}
+          currentSection={currentSection}
+          user={chef}
+          logOut={logout}
+        />
+        <div className="h-16" />
+        <div className="">{content}</div>
       </div>
     );
   } else {
