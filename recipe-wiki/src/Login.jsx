@@ -41,12 +41,12 @@ const Login = ({ onLogin }) => {
           {error}
         </div>
         <div className="">
-          <label>username: </label>
           <div className="inline-block funderline">
             <input
               id="username"
               name="username"
               size="10"
+              placeholder="username"
               value={username}
               onChange={handleChange}
               onKeyDown={enter}
@@ -56,7 +56,7 @@ const Login = ({ onLogin }) => {
 
         <button
           name="login"
-          className="self-center funderline py-1 px-2 m-3 bg-green-200 border rounded"
+          className="self-center funderline py-1 px-2 mt-6 bg-green-200 border rounded"
           onClick={login}
         >
           log in

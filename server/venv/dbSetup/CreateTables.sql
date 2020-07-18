@@ -36,3 +36,19 @@ CREATE INDEX tags_idx ON fooddb.recipe (tags);
 CREATE INDEX chefid_idx ON fooddb.recipe (chefid);
 CREATE INDEX title_idx ON fooddb.recipe (title);
 CREATE INDEX minutes_idx ON fooddb.recipe (minutes);
+
+
+CREATE TABLE fooddb.recipeingredientxref (
+id text PRIMARY KEY,
+ingredientid text,
+recipeid text,
+amount text
+);
+CREATE INDEX ingredientid_idx ON fooddb.recipeingredientxref (ingredientid);
+CREATE INDEX recipeid_idx ON fooddb.recipeingredientxref (recipeid);
+
+CREATE TABLE fooddb.ingredient (
+id text PRIMARY KEY,
+searchname text,
+);
+CREATE CUSTOM INDEX search_idx ON fooddb.ingredient (searchname) USING 'org.apache.cassandra.index.sasi.SASIIndex' WITH OPTIONS = {'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer', 'case_sensitive': 'false'};

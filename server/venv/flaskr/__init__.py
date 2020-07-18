@@ -1,12 +1,13 @@
 import os
 from flask import Flask
 from flask import request
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import SqlFunctions as cql
 from cassandra.cluster import Cluster, ExecutionProfile, EXEC_PROFILE_DEFAULT, ConsistencyLevel
 from cassandra.policies import WhiteListRoundRobinPolicy, DowngradingConsistencyRetryPolicy
 from cassandra.query import dict_factory
 import json
+import inflection
 
 profile = ExecutionProfile(
     load_balancing_policy=WhiteListRoundRobinPolicy(['127.0.0.1']),
@@ -18,6 +19,7 @@ sesh = cluster.connect("fooddb")
 
 app = Flask(__name__)
 cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route('/chef/<user_id>', methods = ['GET', 'POST', 'DELETE'])
 def chef(user_id):
@@ -104,15 +106,17 @@ def recipe(recipe_id):
     try:
         if request.method == 'GET':
             result = cql.get_recipe(session=sesh,id=recipe_id)
+            recipeIngredients = cql.get_recipe_ingredients(session=sesh,recipeid=recipe_id) #id, ingredientid, ingredient, amount, listorder
             if result:
                 recipe={
                     "id":result["id"],
-                    "title":result["title"]
-                    ,"tags":list(result["tags"] if result["tags"] is not None else []),
+                    "title":result["title"],
+                    "tags":list(result["tags"] if result["tags"] is not None else []),
                     "description":result["description"],
                     "image":result["image"],
                     "chefid":result["chefid"],
                     "instructions":result["instructions"],
+                    "ingredients":recipeIngredients,
                     "minutes":result["minutes"]
                     }
                 return recipe
@@ -120,11 +124,13 @@ def recipe(recipe_id):
                 return ("recipe not found",404)
 
         if request.method == 'POST':
-            print("called success")
             data = request.get_json()
-            print("data")
             tagset=set(data["tags"])
+            recipeIngredients = data["ingredients"]
             result = cql.update_recipe(session=sesh,id=data["id"],title=data["title"],description=data["description"],image=data["image"],tags=tagset,instructions=data["instructions"],minutes=data["minutes"])
+            delres = cql.remove_recipe_ingredients(session=sesh,recipeid=data["id"])
+            for i in recipeIngredients:
+                cql.add_ingredient_to_recipe(session=sesh,recipeid=data["id"],ingredientid=i["ingredientid"],amount=i["amount"],name=i["name"],listorder=i["listorder"],notes=i["notes"]);
             if result:
                 return "recipe updated"
             else:
@@ -132,7 +138,9 @@ def recipe(recipe_id):
 
         if request.method == 'DELETE':
             res=cql.delete_recipe(session=sesh,id=recipe_id)
+            ires=cql.delete_recipe_ingredients()
             print(res)
+            print(ires)
             return "recipe deleted"
         else:
             return ("Method Not Allowed", 405)
@@ -163,6 +171,39 @@ def browse():
 
             else:
                 return ("No Results",404)
+        else:
+            return ("Method Not Allowed", 405)
+    except:
+        raise
+        return ("internal server error - data issue", 500)
+
+@app.route('/ingredients', methods = ['GET','POST'])
+def ingredients():
+    try:
+        if request.method == 'GET':
+            term=request.args.get("searchterm").lower()
+            procterm = inflection.singularize(term)
+            result = cql.search_ingredients(session=sesh,searchTerm=procterm)
+            print(result)
+            if result:
+                procresult = []
+                if term != procterm:
+                    for r in result:
+                        procresult.append({"ingredientid":r["id"],"name":inflection.pluralize(r["id"])})
+                else:
+                    for r in result:
+                        procresult.append({"ingredientid":r["id"],"name":r["id"]})
+                return json.dumps(procresult)
+
+            else:
+                return ("No Results",404)
+
+        if request.method == 'POST':
+            name = request.get_json()["name"].lower()
+            ingredientprocessed = inflection.singularize(name)
+            result = cql.create_ingredient(session=sesh,id=ingredientprocessed)
+            return {"name":name, "ingredientid":ingredientprocessed}
+
         else:
             return ("Method Not Allowed", 405)
     except:

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Chef from "./Chef";
 import Login from "./Login";
 import Profile from "./Profile";
@@ -6,7 +6,8 @@ import Recipes from "./Recipes";
 import Header from "./Header";
 import "./assets/main.css";
 import "./assets/tailwind.css";
-
+import config from "./sheetsConfig";
+import SheetsDemo from "./SheetsDemo";
 import { useCookies } from "react-cookie";
 
 const Main = () => {
@@ -23,18 +24,19 @@ const Main = () => {
   }
   const [chef, setChef] = useState(cookiechef);
   const [currentSection, setCurrentSection] = useState("");
+  const [apiActive, setApiActive] = useState(false);
 
   const setUser = (user) => {
     if (user instanceof Chef) {
       setChef(user);
-      setCookie("list", [], { path: "/", maxAge: 1800 });
-      setCookie("chef", user, { path: "/", maxAge: 1800 });
+      setCookie("list", [], { path: "/" });
+      setCookie("chef", user, { path: "/" });
     }
     console.log(cookies);
   };
 
   const logout = () => {
-    removeCookie("chesf");
+    removeCookie("chef");
     setChef(null);
   };
 
@@ -88,7 +90,7 @@ const Main = () => {
           logOut={logout}
         />
         <div className="h-16" />
-        <div className="">{content}</div>
+        {content}
       </div>
     );
   } else {

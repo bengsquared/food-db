@@ -26,15 +26,18 @@ const Recipes = ({ user, cookies, setCookie, removeCookie }) => {
 
   const deleteRecipe = () => {
     removeRecipe(recipe.id, closeRecipe);
+    setCurrentList(currentList.filter((li) => li.id !== recipe.id));
   };
 
   const openRecipe = (id) => {
     getRecipe(id, setRecipe);
+    window.scrollTo({ top: 0 });
   };
 
   const closeRecipe = () => {
     setRecipe("");
     setEditing(false);
+    window.scrollTo({ top: 0 });
   };
 
   const searchCall = () => {
@@ -50,6 +53,7 @@ const Recipes = ({ user, cookies, setCookie, removeCookie }) => {
       setRecipe("");
     }
     setEditing(val);
+    window.scrollTo({ top: 0 });
   };
 
   const handleRecipeUpdate = (recipe) => {
@@ -57,6 +61,7 @@ const Recipes = ({ user, cookies, setCookie, removeCookie }) => {
       ? createRecipe(recipe, setRecipe)
       : updateRecipe(recipe, setRecipe);
     setEditing(false);
+    window.scrollTo({ top: 0 });
   };
 
   const newRecipe = (recipe) => {
@@ -65,7 +70,8 @@ const Recipes = ({ user, cookies, setCookie, removeCookie }) => {
       "New Recipe Title",
       user.id,
       "A quick, informative, searchable blurb",
-      "Ingredients:\n-\n-\n\nStep 1:\n\n\nStep 2:\n\n\nStep 3:\n\n\n",
+      [],
+      "Step 1:\n\n\nStep 2:\n\n\nStep 3:\n\n\n",
       15,
       "https://olddesignshop.com/wp-content/uploads/2017/11/Vintage-Recipes-Bread-Rolls-Old-Design-Shop.jpg",
       []

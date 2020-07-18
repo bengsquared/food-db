@@ -130,7 +130,7 @@ def search_recipes(session,searchterms,chefid,tags):
 
     res=session.execute("""
         select id, title, description,minutes,image,tags
-        from recipe
+        from fooddb.recipe
         where chefid = %(chefid)s
         ;
         """
@@ -149,5 +149,73 @@ def delete_recipe(session,id):
         """,
         (id,)
     )
+    return res
+
+
+def search_ingredients(session,searchTerm):
+    term = searchTerm + '%'
+    print(term)
+    print(type(term))
+    res = session.execute("""
+        select id from fooddb.ingredient
+        where searchname like %s
+        ;
+        """,
+        (term,)
+    ).all()
+    print(res)
+    return res
+
+def create_ingredient(session,id):
+    res = session.execute("""
+        INSERT INTO fooddb.ingredient(id,searchname)
+        values(%s,%s)
+        ;
+        """,
+        (id,id)
+    )
     print(res)
     return
+
+def remove_recipe_ingredients(session,recipeid):
+    res = session.execute("""
+        select id from fooddb.recipeingredientxref
+        where recipeid = %s
+        ;
+        """,
+        (recipeid,)
+    ).all()
+    for row in res:
+        remove_ingredient_from_recipe(session=session,id=row["id"])
+    return
+
+def remove_ingredient_from_recipe(session,id):
+    res = session.execute_async("""
+        DELETE from fooddb.recipeingredientxref
+        where id = %s
+        ;
+        """,
+        (id,)
+    )
+    return
+
+def add_ingredient_to_recipe(session,recipeid,ingredientid,amount,name,listorder,notes):
+    id = ingredientid + recipeid
+    res = session.execute("""
+        INSERT INTO fooddb.recipeingredientxref(id,recipeid,ingredientid,amount,name,listorder,notes)
+        values(%s,%s,%s,%s,%s,%s,%s)
+        ;
+        """,
+        (id,recipeid,ingredientid,amount,name,listorder,notes)
+    )
+    return
+
+def get_recipe_ingredients(session,recipeid):
+    res = session.execute("""
+        select id, ingredientid, amount, name,listorder,notes from fooddb.recipeingredientxref
+        where recipeid = %s
+        ;
+        """,
+        (recipeid,)
+    );
+    return res.all()

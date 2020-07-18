@@ -29,6 +29,10 @@ input:focus {
   outline: none;
 }
 
+textarea:focus {
+  outline: none;
+}
+
 .recipecard {
   transition: box-shadow 250ms ease-in-out, transform 250ms ease-in-out;
 }
@@ -37,6 +41,16 @@ input:focus {
   transform: translateY(-2px);
   box-shadow: 0 3px 5px 0px rgba(0, 0, 0, 0.1),
     0 1px 3px -1px rgba(0, 0, 0, 0.06);
+}
+pre {
+  font-size: 1rem;
+  font-family: monospace, monospace; /* 1 */
+  overflow-x: auto;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
 }
 
 @tailwind components;
