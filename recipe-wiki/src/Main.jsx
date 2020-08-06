@@ -1,103 +1,106 @@
-import React, { useState, useEffect } from "react";
-import Chef from "./Chef";
-import Login from "./Login";
+import React from "react";
 import Profile from "./Profile";
 import Recipes from "./Recipes";
 import Header from "./Header";
 import "./assets/main.css";
 import "./assets/tailwind.css";
-import config from "./sheetsConfig";
-import SheetsDemo from "./SheetsDemo";
 import { useCookies } from "react-cookie";
+import { defaultToken } from "./constants";
+import { Router, Redirect } from "@reach/router";
+import {
+  useLoginStatus,
+  useCurrentChefId,
+  useCurrentToken,
+  MAIN_FETCH,
+} from "./serverfunctions";
+import { useApolloClient, gql } from "@apollo/client";
 
-const Main = () => {
-  const [cookies, setCookie, removeCookie] = useCookies(["chef"]["list"]);
-  let cookiechef = null;
-  if (cookies ? cookies.chef : false) {
-    cookiechef = new Chef(
-      cookies.chef.id,
-      cookies.chef.username,
-      cookies.chef.name,
-      cookies.chef.bio,
-      cookies.chef.image
+const NotFound = () => <div>Sorry, nothing here.</div>;
+
+const Main = ({ navigate }) => {
+  const client = useApolloClient();
+  const token = useCurrentToken();
+  const chef = useCurrentChefId();
+  const loggedin = useLoginStatus();
+  const [cookie, setCookie, removeCookie] = useCookies([
+    "userToken",
+    "currentUserID",
+  ]);
+  if (
+    !(loggedin || { isLoggedIn: false }).isLoggedIn ||
+    (token.token || defaultToken) === defaultToken ||
+    !chef.currentUserID
+  ) {
+    removeCookie("userToken", { path: "/" });
+    removeCookie("currentUserID", { path: "/" });
+    client.writeQuery({
+      query: gql`
+        query GetState {
+          isLoggedIn @client
+          token @client
+          currentUserID @client
+        }
+      `,
+      data: {
+        isLoggedIn: false,
+        token: defaultToken,
+        currentUserID: null,
+      },
+    });
+    navigate("/login");
+    return <NotFound />;
+  }
+
+  client
+    .query({
+      query: MAIN_FETCH,
+      variables: {
+        id: chef.currentUserID,
+      },
+      context: {
+        headers: {
+          authorization: "Bearer " + token.token,
+        },
+      },
+    })
+    .then(
+      (value) => {},
+      (error) => {
+        if (
+          String(error).includes("Invalid authorization header") ||
+          String(error).includes("Invalid database secret")
+        ) {
+          removeCookie("userToken", { path: "/" });
+          removeCookie("currentUserID", { path: "/" });
+          client.writeQuery({
+            query: gql`
+              query GetState {
+                isLoggedIn @client
+                token @client
+                currentUserID @client
+              }
+            `,
+            data: {
+              isLoggedIn: false,
+              token: defaultToken,
+              currentUserID: null,
+            },
+          });
+          navigate("/login");
+        }
+      }
     );
-  }
-  const [chef, setChef] = useState(cookiechef);
-  const [currentSection, setCurrentSection] = useState("");
-  const [apiActive, setApiActive] = useState(false);
 
-  const setUser = (user) => {
-    if (user instanceof Chef) {
-      setChef(user);
-      setCookie("list", [], { path: "/" });
-      setCookie("chef", user, { path: "/" });
-    }
-    console.log(cookies);
-  };
-
-  const logout = () => {
-    removeCookie("chef");
-    setChef(null);
-  };
-
-  const setPage = (page) => {
-    console.log(page);
-    switch (page) {
-      case "Profile":
-        setCurrentSection("Profile");
-        break;
-      case "Recipes":
-        setCurrentSection("Recipes");
-        break;
-      default:
-        setCurrentSection("Profile");
-    }
-  };
-
-  let result;
-  let content;
-  switch (currentSection) {
-    case "Profile":
-      content = <Profile onSave={setUser} user={chef} />;
-      break;
-    case "Recipes":
-      content = (
-        <Recipes
-          user={chef}
-          cookies={cookies}
-          setCookie={setCookie}
-          removeCookie={removeCookie}
-        />
-      );
-      break;
-    default:
-      content = (
-        <Recipes
-          user={chef}
-          cookies={cookies}
-          setCookie={setCookie}
-          removeCookie={removeCookie}
-        />
-      );
-  }
-  if (chef instanceof Chef) {
-    result = (
-      <div className="bg-white min-h-screen">
-        <Header
-          setNav={setPage}
-          currentSection={currentSection}
-          user={chef}
-          logOut={logout}
-        />
-        <div className="h-16" />
-        {content}
-      </div>
-    );
-  } else {
-    result = <Login onLogin={setUser} />;
-  }
-
-  return result;
+  return (
+    <div>
+      <Header />
+      <Router className="pt-20">
+        <Recipes path="/recipes/*" />
+        <Profile path="/profile/me/*" />
+        <Redirect noThrow from="/" to="/recipes/browse" default />
+      </Router>
+    </div>
+  );
 };
 
 export default Main;

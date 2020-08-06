@@ -21,8 +21,7 @@ export class Recipe {
     instructions,
     ingredients,
     minutes,
-    image,
-    tags
+    image
   ) {
     this.id = id;
     this.title = title;
@@ -32,7 +31,6 @@ export class Recipe {
     this.ingredients = ingredients;
     this.minutes = minutes;
     this.image = image;
-    this.tags = tags;
   }
 }
 

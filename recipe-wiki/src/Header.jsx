@@ -1,19 +1,63 @@
 import React, { useState } from "react";
+import { Router, Link, navigate } from "@reach/router";
+import { useCookies } from "react-cookie";
+import {
+  ApolloClient,
+  InMemoryCache,
+  useApolloClient,
+  gql,
+} from "@apollo/client";
+import { defaultToken } from "./constants";
+import { useCurrentToken } from "./serverfunctions";
 
-const Header = ({ setNav, user, logOut, currentSection }) => {
+const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const navigate = (e) => {
-    setNav(e.target.getAttribute("name"));
-    console.log(e.target.getAttribute("name"));
-    console.log(e.target);
+  const token = useCurrentToken();
+  const [cookies, setCookie, removeCookie] = useCookies(
+    ["userToken"],
+    ["currentUserID"]
+  );
+  const client = useApolloClient();
+  const logOut = () => {
+    client.clearStore().then(() => {
+      removeCookie("userToken", { path: "/" });
+      removeCookie("currentUserID", { path: "/" });
+      client.mutate({
+        mutation: gql`
+          mutation logout {
+            logoutChef
+          }
+        `,
+        context: {
+          headers: {
+            authorization: "Bearer " + token.token,
+          },
+        },
+      });
+      client.writeQuery({
+        query: gql`
+          query GetState {
+            isLoggedIn @client
+            token @client
+          }
+        `,
+        data: {
+          isLoggedIn: false,
+          token: defaultToken,
+        },
+      });
+      navigate("/login");
+    });
   };
 
   return (
     <div className="border z-10 items-center flex flex-col sm:flex-row p-3 fixed h-auto w-full bg-white">
-      <div className="mx-auto sm:mx-1 m-1 p3 ">
-        <h2>Recipe Wiki</h2>
-      </div>
+      <button
+        onClick={() => navigate("/recipes/browse")}
+        className="mx-auto sm:mx-1 m-1 p3 "
+      >
+        <h2>RecipeBox</h2>
+      </button>
       <button
         className="absolute top-0 right-0 w-5 h-5 m-5 sm:hidden overflow-visible "
         onClick={() => setMenuOpen(!menuOpen)}
@@ -50,7 +94,8 @@ const Header = ({ setNav, user, logOut, currentSection }) => {
           className=" px-0 py-3 sm:px-3 sm:py-0 funderline"
           onClick={(e) => {
             setMenuOpen(false);
-            navigate(e);
+            window.scrollTo({ top: 0 });
+            navigate("/profile/me/");
           }}
         >
           Profile
@@ -60,7 +105,8 @@ const Header = ({ setNav, user, logOut, currentSection }) => {
           className=" px-0 py-3 sm:px-3 sm:py-0 funderline"
           onClick={(e) => {
             setMenuOpen(false);
-            navigate(e);
+            window.scrollTo({ top: 0 });
+            navigate("/recipes/browse");
           }}
         >
           Recipes

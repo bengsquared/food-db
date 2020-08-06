@@ -1,0 +1,94 @@
+create chefs
+
+Query(
+  Lambda(
+    ["input"],
+    Create(Collection("chefs"), {
+      data: { username: Select("username", Var("input")) },
+      credentials: { password: Select("password", Var("input")) }
+    })
+  )
+)
+
+create recipe
+Query(
+  Lambda(
+    ["input"],
+    Create(Collection("recipes"), {
+      data: {
+        image: Select("image", Var("input")),
+        description: Select("description", Var("input")),
+        ingredients: Select("ingredients", Var("input")),
+        instructions: Select("instructions", Var("input")),
+        time: Select("time", Var("input")),
+        title: Select("title", Var("input")),
+        chef: Identity()
+      }
+    })
+  )
+)
+
+del
+Query(
+  Lambda(
+    "id",
+    If(
+      Equals(
+        Select("id", Identity()),
+        Select("id", Select("chef", Get(Ref(Collection("recipes"), Var("id")))))
+      ),
+      Delete(Ref(Collection("recipes"), Var("id"))),
+      Abort("you can't do that! unauthorized")
+    )
+  )
+)
+
+Query(
+  Lambda(
+    ["input"],
+    Select(
+      "secret",
+      Login(
+        Match(Index("unique_Chef_username"), Select("username", Var("input"))),
+        { password: Select("password", Var("input")) }
+      )
+    )
+  )
+)
+
+Query(
+  Lambda(
+    ["input"],
+    Update(Identity(), {
+      name: Select("name", Var("input")),
+      bio: Select("bio", Var("input"))
+    })
+  )
+)
+
+Query(
+  Lambda(
+    ["input"],
+    If(
+      Equals(
+        Select("id", Identity()),
+        Select(
+          "id",
+          Select(
+            "chef",
+            Get(Ref(Collection("recipes"), Select("id", Var("input"))))
+          )
+        )
+      ),
+      Update(Ref(Collection("recipes"), Select("id", Var("input"))), {
+        image: Select("image", Var("input")),
+        description: Select("description", Var("input")),
+        ingredients: Select("ingredients", Var("input")),
+        instructions: Select("instructions", Var("input")),
+        time: Select("time", Var("input")),
+        title: Select("title", Var("input"))
+      }),
+      Abort("you can't do that! unauthorized")
+    )
+  )
+)

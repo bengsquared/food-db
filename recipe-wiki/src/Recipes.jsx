@@ -10,113 +10,111 @@ import {
 import Search from "./Search";
 import RecipeEditor from "./RecipeEditor";
 import RecipeViewer from "./RecipeViewer";
+import { useQuery } from "@apollo/client";
+import { Router, Link, Redirect, navigate } from "@reach/router";
+import {
+  GET_FULL_RECIPE,
+  useCurrentToken,
+  useCurrentChefId,
+  recipeTemplate,
+} from "./serverfunctions";
 
-const Recipes = ({ user, cookies, setCookie, removeCookie }) => {
+const Recipes = () => {
   const [recipe, setRecipe] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [results, setResults] = useState([]);
-  const [currentList, setCurrentList] = useState([]);
-  const [editing, setEditing] = useState(false);
   const [renderCount, setRenderCount] = useState(0);
 
-  const updateRecipeList = (recipes) => {
-    setResults(recipes);
-    setCurrentList(recipes);
-  };
-
-  const deleteRecipe = () => {
-    removeRecipe(recipe.id, closeRecipe);
-    setCurrentList(currentList.filter((li) => li.id !== recipe.id));
-  };
-
   const openRecipe = (id) => {
-    getRecipe(id, setRecipe);
+    setRecipe(id);
+    navigate(`/recipes/browse/${id}/`);
     window.scrollTo({ top: 0 });
   };
 
   const closeRecipe = () => {
+    navigate("/recipes/browse");
     setRecipe("");
-    setEditing(false);
     window.scrollTo({ top: 0 });
   };
 
-  const searchCall = () => {
-    searchRecipes([], searchTerm, id, updateRecipeList);
+  const newRecipe = () => {
+    setRecipe("new");
+    navigate("/recipes/create");
   };
 
-  const handleSearchTermChange = (val) => {
-    setSearchTerm(val);
-  };
-
-  const handleEdit = (val) => {
-    if (val === false && recipe.id === "") {
-      setRecipe("");
-    }
-    setEditing(val);
-    window.scrollTo({ top: 0 });
-  };
-
-  const handleRecipeUpdate = (recipe) => {
-    recipe.id === ""
-      ? createRecipe(recipe, setRecipe)
-      : updateRecipe(recipe, setRecipe);
-    setEditing(false);
-    window.scrollTo({ top: 0 });
-  };
-
-  const newRecipe = (recipe) => {
-    let recipeTemplate = new Recipe(
-      "",
-      "New Recipe Title",
-      user.id,
-      "A quick, informative, searchable blurb",
-      [],
-      "Step 1:\n\n\nStep 2:\n\n\nStep 3:\n\n\n",
-      15,
-      "https://olddesignshop.com/wp-content/uploads/2017/11/Vintage-Recipes-Bread-Rolls-Old-Design-Shop.jpg",
-      []
-    );
-    setRecipe(recipeTemplate);
-    setEditing(true);
-  };
-
-  let id = user.id;
-  let result;
-  if (currentList.length === 0 && renderCount === 0 && searchTerm === "") {
-    let a = renderCount;
-    setRenderCount(a + 1);
-    searchCall();
-    console.log("call made automatically");
-    console.log(renderCount);
-  }
-  if (recipe === "") {
-    result = (
-      <Search
-        currentList={currentList}
-        searchTerm={searchTerm}
-        setSearchTerm={handleSearchTermChange}
-        openRecipe={openRecipe}
-        searchCall={searchCall}
-        newRecipe={newRecipe}
-      />
-    );
-  } else {
-    result = editing ? (
+  return (
+    <Router>
       <RecipeEditor
-        recipe={recipe}
-        setEditing={handleEdit}
-        saveRecipe={handleRecipeUpdate}
-        deleteRecipe={deleteRecipe}
+        path="create"
+        recipe={recipeTemplate}
+        refetch={setRecipe}
+        setEditing={closeRecipe}
       />
-    ) : (
-      <RecipeViewer
-        recipe={recipe}
-        closeRecipe={closeRecipe}
-        setEditing={handleEdit}
+      <RecipePage path="browse/:id/*" closeRecipe={closeRecipe} />
+      <Search
+        path="browse"
+        openRecipe={openRecipe}
+        newRecipe={newRecipe}
+        default
       />
+    </Router>
+  );
+};
+
+const RecipePage = ({ id, closeRecipe }) => {
+  const token = useCurrentToken();
+  const chefid = useCurrentChefId();
+  const [editing, setEditing] = useState(false);
+  const { loading, error, data, refetch } = useQuery(GET_FULL_RECIPE, {
+    context: {
+      headers: {
+        authorization: "Bearer " + token.token,
+      },
+    },
+    variables: {
+      id: id,
+    },
+  });
+
+  if (loading) {
+    return <div>loading...</div>;
+  } else if (!!error) {
+    return <div>{error.message}</div>;
+  } else if (data.findRecipeByID === null) {
+    return (
+      <div className="mx-20 mt-20 text-xl">
+        {"Not found :/"}
+        <br />
+        <Link to="/">
+          <u>take me home</u>
+        </Link>
+      </div>
     );
   }
-  return result;
+
+  const toggleEdit = () => {
+    editing
+      ? navigate(`/recipes/browse/${id}`)
+      : navigate(`/recipes/browse/${id}/edit`);
+    setEditing(!editing);
+  };
+
+  return (
+    <Router>
+      <RecipeEditor
+        path="/edit"
+        recipe={data.findRecipeByID}
+        refetch={refetch}
+        closeRecipe={closeRecipe}
+        setEditing={toggleEdit}
+      />
+      <RecipeViewer
+        path="/"
+        setEditing={toggleEdit}
+        closeRecipe={closeRecipe}
+        recipe={data.findRecipeByID}
+        default
+      />
+    </Router>
+  );
 };
 
 export default Recipes;

@@ -1,24 +1,56 @@
-import React from "react";
-import { foodemoji } from "./recipe";
-const Search = ({
-  currentList,
-  searchTerm,
-  setSearchTerm,
-  openRecipe,
-  searchCall,
-  newRecipe,
-}) => {
+import React, { useState } from "react";
+import { gql, useQuery } from "@apollo/client";
+import {
+  useCurrentToken,
+  GET_CHEF_RECIPES,
+  useCurrentChefId,
+  foodemoji,
+} from "./serverfunctions";
+
+const Search = ({ openRecipe, newRecipe }) => {
+  const token = useCurrentToken();
+  const chefid = useCurrentChefId();
+  const { loading, error, data, refetch } = useQuery(GET_CHEF_RECIPES, {
+    variables: {
+      id: chefid.currentUserID,
+    },
+    context: {
+      headers: {
+        authorization: "Bearer " + token.token,
+      },
+    },
+    notifyOnNetworkStatusChange: true,
+  });
+  const [currentList, setCurrentList] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const handleChange = (e) => {
-    if (e.target.getAttribute("name") === "searchbox") {
-      setSearchTerm(e.target.value);
-    }
+    setSearchTerm(e.target.value);
+    searchFilter(e.target.value);
     e.preventDefault();
   };
 
-  const searchonenter = (e) => {
-    if (e.key === "Enter") {
-      searchCall();
-      console.log(currentList);
+  const searchFilter = (term) => {
+    if (!!data && term !== "") {
+      let terms_processed = new RegExp(term.trim().replace(/\W+/g, "|"), "gi");
+      let rec = data.findChefByID.recipes.data;
+      let concat = "";
+      let datalist = [];
+      let relevance = 0;
+      for (let r of rec) {
+        concat = String(r.title) + " " + String(r.description);
+        relevance = concat.match(terms_processed);
+        if (!!relevance) {
+          datalist.push({ ...r, rel: relevance.length });
+        }
+      }
+      setCurrentList(
+        datalist === []
+          ? []
+          : datalist.sort((a, b) => {
+              return b.rel - a.rel;
+            })
+      );
     }
   };
 
@@ -32,10 +64,9 @@ const Search = ({
             className="w-full"
             value={searchTerm}
             onChange={handleChange}
-            onKeyDown={searchonenter}
           ></input>
         </div>
-        <button name="search" onClick={searchCall} className="mx-2">
+        <button name="search" className="mx-2">
           <span className="inline" role="img" aria-label="search">
             🔍
           </span>
@@ -50,13 +81,31 @@ const Search = ({
         </button>
       </div>
       <div className="col-span-12 h-full overflow-y-show grid gap-4">
-        {currentList === [] ? (
+        {!!loading ? (
+          <div> {"Loading..."} </div>
+        ) : !!error ? (
+          <div> {String(Error)} </div>
+        ) : searchTerm === "" && data.findChefByID.recipes.data.length > 0 ? (
+          data.findChefByID.recipes.data.map((res) => (
+            <ResultCard key={res._id} res={res} openRecipe={openRecipe} />
+          ))
+        ) : data.findChefByID.recipes.data.length === 0 ? (
+          <div className="w-full text-center text-md p-4">
+            <h2>
+              {"you don't have any recipes right now, you should put some in!"}
+              <br />
+              <button className="funderline p-4" onClick={newRecipe}>
+                create a new recipe
+              </button>
+            </h2>
+          </div>
+        ) : currentList.length === 0 ? (
           <div>
-            <h2>No recipes to show :(</h2>
+            <h2>No Matching Recipes :(</h2>
           </div>
         ) : (
           currentList.map((res) => (
-            <ResultCard key={res.id} res={res} openRecipe={openRecipe} />
+            <ResultCard key={res._id} res={res} openRecipe={openRecipe} />
           ))
         )}
       </div>
@@ -65,13 +114,11 @@ const Search = ({
 };
 
 const ResultCard = ({ res, openRecipe }) => {
-  console.log(res);
-  console.log(res.minutes);
   return (
     <div
       className="h-auto sm:h-56 recipecard p-4 gap-8 col-span-12 border flex flex-col-reverse sm:grid sm:grid-cols-12 cursor-pointer "
       onClick={() => {
-        openRecipe(res.id);
+        openRecipe(res._id);
       }}
     >
       <div className="flex-grow sm:col-span-8">
@@ -80,19 +127,21 @@ const ResultCard = ({ res, openRecipe }) => {
           <span role="img" aria-label="time">
             ⏱
           </span>
-          {Math.floor(res.minutes / 60)}h:{res.minutes % 60}m{" "}
+          {Math.floor(res.time / 60)}h:{res.time % 60}m{" "}
         </p>
         <p className="text-base">{res.description}</p>
       </div>
       <div className="flex-none h-48 sm:col-span-4 sm:h-48 leading-relaxed text-center">
-        {res.image === "" ? (
+        {(res.image || "") === "" || foodemoji.includes(res.image) ? (
           <span
             role="img"
             style={{ fontSize: "8rem", lineHeight: "normal" }}
             aria-label="food emoji"
             className="align-middle"
           >
-            {foodemoji[Math.floor(Math.random() * foodemoji.length)]}
+            {foodemoji.includes(res.image)
+              ? res.image
+              : foodemoji[Math.floor(Math.random() * foodemoji.length)]}
           </span>
         ) : (
           <img
