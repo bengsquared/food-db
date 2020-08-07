@@ -1,18 +1,10 @@
 import React, { useState } from "react";
-import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
-import { Ingredient, searchIngredients, createIngredient } from "./recipe";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client";
 import {
-  UPDATE_RECIPE,
   CREATE_INGREDIENT,
   GET_ALL_INGREDIENTS,
-  DELETE_RECIPE,
-  NEW_RECIPE,
-  useCurrentChefId,
   useCurrentToken,
-  foodemoji,
 } from "./serverfunctions";
-import { Router, Link, navigate } from "@reach/router";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import pluralize from "pluralize";
 
 const IngredientPicker = React.forwardRef(

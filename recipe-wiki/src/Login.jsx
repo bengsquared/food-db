@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { useApolloClient, useMutation, useQuery, gql } from "@apollo/client";
-import { defaultToken } from "./constants";
+import { useMutation, gql } from "@apollo/client";
 import { Router } from "@reach/router";
 import { useLoginStatus, useCurrentToken } from "./serverfunctions";
 import background from "./assets/loginBackground.svg";
@@ -29,7 +28,7 @@ const Login = ({ onLogin, navigate }) => {
       className="min-h-screen w-full items-center bg-cover flex justify-center bg-local"
       style={{ backgroundImage: `url(${background})` }}
     >
-      <Router className="w-full min-h-screen items-center flex justify-center">
+      <Router className="w-full min-h-screen flex justify-center">
         <LoginScreen path="/" onLogin={onLogin} />
         <SignUpScreen path="/signup" onLogin={onLogin} />
       </Router>
@@ -40,10 +39,8 @@ const Login = ({ onLogin, navigate }) => {
 const LoginScreen = ({ onLogin, navigate }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const client = useApolloClient();
   const token = useCurrentToken();
   const [errorMessage, setErrorMessage] = useState("");
-  const loginstatus = useLoginStatus();
   const [login, { loading, error }] = useMutation(LOGIN_USER, {
     onCompleted(res) {
       onLogin(res.loginChef, false);
@@ -60,9 +57,9 @@ const LoginScreen = ({ onLogin, navigate }) => {
   });
 
   const handleChange = (e) => {
-    if (e.target.name == "username") {
+    if (e.target.name === "username") {
       setUsername(e.target.value);
-    } else if (e.target.name == "password") {
+    } else if (e.target.name === "password") {
       setPassword(e.target.value);
     }
     e.preventDefault();
@@ -89,7 +86,7 @@ const LoginScreen = ({ onLogin, navigate }) => {
   return (
     <div
       id="login"
-      className="w-full h-screen md:h-auto md:w-auto md:max-w-md md:-mt-48 p-12 flex flex-col self-center bg-white overflow-hidden items-center shadow-lg"
+      className="w-full self-center  sm:h-auto sm:w-auto sm:max-w-md sm:mt-20 md:mt-24 lg:mt-40 p-12 flex flex-col sm:self-start bg-white overflow-hidden items-center shadow-lg"
     >
       <div className="m-1 text-3xl text-center p-1">recipebox</div>
       <div
@@ -165,7 +162,6 @@ const LoginScreen = ({ onLogin, navigate }) => {
 const SignUpScreen = ({ onLogin, navigate }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const client = useApolloClient();
   const token = useCurrentToken();
   const [errorMessage, setErrorMessage] = useState(null);
   const [passwordMessage, setPasswordMessage] = useState("secret passphrase:");
@@ -201,9 +197,9 @@ const SignUpScreen = ({ onLogin, navigate }) => {
   const pref = React.createRef();
 
   const handleChange = (e) => {
-    if (e.target.name == "username") {
+    if (e.target.name === "username") {
       setUsername(e.target.value);
-    } else if (e.target.name == "password") {
+    } else if (e.target.name === "password") {
       setPassword(e.target.value);
     }
     e.preventDefault();
@@ -248,7 +244,7 @@ const SignUpScreen = ({ onLogin, navigate }) => {
   };
 
   return (
-    <div className="w-full h-screen md:h-auto md:w-auto md:max-w-md md:-mt-48 p-12 flex flex-col self-center bg-white overflow-hidden items-center shadow-lg">
+    <div className="w-full h-screen sm:h-auto sm:w-auto sm:max-w-md sm:-mt-48 p-12 flex flex-col self-center bg-white overflow-hidden items-center shadow-lg">
       <div className="m-1 text-3xl p-1">recipebox</div>
       <form>
         <p className={!!errorMessage ? "text-red-700" : ""}>

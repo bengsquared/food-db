@@ -1,32 +1,14 @@
 import React, { useState } from "react";
-import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
-import { Ingredient, searchIngredients, createIngredient } from "./recipe";
-import {
-  UPDATE_RECIPE,
-  CREATE_INGREDIENT,
-  GET_ALL_INGREDIENTS,
-  DELETE_RECIPE,
-  NEW_RECIPE,
-  useCurrentChefId,
-  useCurrentToken,
-  foodemoji,
-} from "./serverfunctions";
-import { Router, Link, navigate } from "@reach/router";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import pluralize from "pluralize";
 import IngredientPicker from "./IngredientPicker";
 import handle from "./assets/handle.svg";
 
 const IngredientEditEntry = React.forwardRef((props, ref) => {
-  const [searchTerm, setSearchTerm] = useState("");
   const [ingredient, setIngredient] = useState({
     ...props.ingredient,
     order: props.dex,
   });
   let ingredientref = React.createRef();
   let notesref = React.createRef();
-  const [over, setOver] = useState(false);
-  let dragTimeout = null;
 
   const changeIngredient = (input) => {
     setIngredient(input);
@@ -63,6 +45,7 @@ const IngredientEditEntry = React.forwardRef((props, ref) => {
       <form className="col-span-5 sm:col-span-6 grid grid-cols-12 sm:divide-x sm:divide-gray-400 sm:w-full">
         <div className="col-span-12 flex sm:block sm:col-span-2 p-2 sm:p-4">
           <img
+            alt=""
             className="absolute z-2 -ml-6 mt-12 sm:mt-1 w-2 object-contain"
             src={handle}
           ></img>
@@ -125,7 +108,9 @@ const IngredientEditEntry = React.forwardRef((props, ref) => {
           props.removeIngredient(props.dex);
         }}
       >
-        ✖️
+        <span role="img" aria-label="close">
+          ✖️
+        </span>
       </button>
     </div>
   );

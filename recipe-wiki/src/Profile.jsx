@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { Router, navigate } from "@reach/router";
 import {
   useCurrentToken,
@@ -11,7 +11,6 @@ import {
 const Profile = ({ onSave }) => {
   const token = useCurrentToken();
   const chefid = useCurrentChefId();
-  const client = useApolloClient();
   const [editing, setEditing] = useState(false);
   console.log(chefid);
   const { loading, error, data } = useQuery(GET_CHEF_PROFILE, {
@@ -92,7 +91,7 @@ const EditProfile = ({ chef, setEditing }) => {
             ? newChef.image
             : "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/237/shallow-pan-of-food_1f958.png"
         }
-        alt="profile picture"
+        alt="profile avatar"
       ></img>
       <div className="w-2/3 mx-auto mb-8 text-xs ">
         {"paste a link to change your picture: "}
@@ -194,7 +193,7 @@ const ViewProfile = ({ setEditing, chef }) => {
             ? "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/237/shallow-pan-of-food_1f958.png"
             : chef.image
         }
-        alt="profile picture"
+        alt="profile avatar"
       ></img>
       <div className="mx-auto flex-grow w-2/3 text-gray-600">
         <pre className="max-w-full ">

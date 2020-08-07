@@ -17,6 +17,12 @@
   transform: scaleX(1);
 }
 
+.funky:hover {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url("./loginBackground.svg");
+}
+
 .funderline:after {
   transform-origin: 0% 50%;
 }

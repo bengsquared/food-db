@@ -1,17 +1,9 @@
 import React, { useState } from "react";
-import {
-  searchRecipes,
-  getRecipe,
-  updateRecipe,
-  createRecipe,
-  removeRecipe,
-  Recipe,
-} from "./recipe";
 import Search from "./Search";
 import RecipeEditor from "./RecipeEditor";
 import RecipeViewer from "./RecipeViewer";
 import { useQuery } from "@apollo/client";
-import { Router, Link, Redirect, navigate } from "@reach/router";
+import { Router, Link, navigate } from "@reach/router";
 import {
   GET_FULL_RECIPE,
   useCurrentToken,
@@ -20,23 +12,17 @@ import {
 } from "./serverfunctions";
 
 const Recipes = () => {
-  const [recipe, setRecipe] = useState("");
-  const [renderCount, setRenderCount] = useState(0);
-
   const openRecipe = (id) => {
-    setRecipe(id);
     navigate(`/recipes/browse/${id}/`);
     window.scrollTo({ top: 0 });
   };
 
   const closeRecipe = () => {
     navigate("/recipes/browse");
-    setRecipe("");
     window.scrollTo({ top: 0 });
   };
 
   const newRecipe = () => {
-    setRecipe("new");
     navigate("/recipes/create");
   };
 
@@ -45,7 +31,7 @@ const Recipes = () => {
       <RecipeEditor
         path="create"
         recipe={recipeTemplate}
-        refetch={setRecipe}
+        refetch={closeRecipe}
         setEditing={closeRecipe}
       />
       <RecipePage path="browse/:id/*" closeRecipe={closeRecipe} />
@@ -61,7 +47,6 @@ const Recipes = () => {
 
 const RecipePage = ({ id, closeRecipe }) => {
   const token = useCurrentToken();
-  const chefid = useCurrentChefId();
   const [editing, setEditing] = useState(false);
   const { loading, error, data, refetch } = useQuery(GET_FULL_RECIPE, {
     context: {

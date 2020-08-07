@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import {
   useCurrentToken,
   GET_CHEF_RECIPES,
@@ -10,7 +10,7 @@ import {
 const Search = ({ openRecipe, newRecipe }) => {
   const token = useCurrentToken();
   const chefid = useCurrentChefId();
-  const { loading, error, data, refetch } = useQuery(GET_CHEF_RECIPES, {
+  const { loading, error, data } = useQuery(GET_CHEF_RECIPES, {
     variables: {
       id: chefid.currentUserID,
     },
@@ -137,7 +137,7 @@ const ResultCard = ({ res, openRecipe }) => {
             role="img"
             style={{ fontSize: "8rem", lineHeight: "normal" }}
             aria-label="food emoji"
-            className="align-middle"
+            className="align-middle p-1"
           >
             {foodemoji.includes(res.image)
               ? res.image

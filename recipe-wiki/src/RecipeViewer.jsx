@@ -24,7 +24,7 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
           <line x1="2" y1="2" x2="48" y2="48" stroke="black"></line>
           <line x1="2" y1="48" x2="48" y2="2" stroke="black"></line>
         </svg>
-        <p className="hidden sm:inline">close</p>
+        <p className="hidden funderline sm:inline">close</p>
       </button>
       <div className="col-span-12 flex text-xl sm:justify-center sm:text-2xl mb-8">
         <div className="w-3/4 sm:w-2/3 sm:text-center ">{recipe.title}</div>
@@ -86,7 +86,10 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
         <pre className="mx-auto w-2/3 ">{recipe.instructions}</pre>
       </div>
       <div className="col-span-12 flex justify-center">
-        <button className="border px-4 border-black h-10 " onClick={edit}>
+        <button
+          className="border px-4 border-black h-10 funderline"
+          onClick={edit}
+        >
           edit
         </button>
       </div>

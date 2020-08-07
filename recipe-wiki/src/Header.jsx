@@ -1,12 +1,7 @@
 import React, { useState } from "react";
-import { Router, Link, navigate } from "@reach/router";
+import { navigate } from "@reach/router";
 import { useCookies } from "react-cookie";
-import {
-  ApolloClient,
-  InMemoryCache,
-  useApolloClient,
-  gql,
-} from "@apollo/client";
+import { useApolloClient, gql } from "@apollo/client";
 import { defaultToken } from "./constants";
 import { useCurrentToken } from "./serverfunctions";
 
@@ -54,7 +49,7 @@ const Header = () => {
     <div className="border z-10 items-center flex flex-col sm:flex-row p-3 fixed h-auto w-full bg-white">
       <button
         onClick={() => navigate("/recipes/browse")}
-        className="mx-auto sm:mx-1 m-1 p3 "
+        className="mx-auto sm:mx-1  p-2 funky hover:font-bold hover:text-white"
       >
         <h2>RecipeBox</h2>
       </button>

@@ -1,26 +1,15 @@
 import React, { useState } from "react";
-import {
-  gql,
-  useApolloClient,
-  InMemoryCache,
-  useMutation,
-  useQuery,
-} from "@apollo/client";
-import { Ingredient, searchIngredients, createIngredient } from "./recipe";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
 import {
   UPDATE_RECIPE,
-  CREATE_INGREDIENT,
-  GET_ALL_INGREDIENTS,
-  GET_CHEF_RECIPES,
   DELETE_RECIPE,
   NEW_RECIPE,
   useCurrentChefId,
   useCurrentToken,
   foodemoji,
 } from "./serverfunctions";
-import { Router, Link, navigate } from "@reach/router";
+import { navigate } from "@reach/router";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import pluralize from "pluralize";
 import IngredientEditEntry from "./IngredientEditEntry";
 
 const RecipeEditor = ({
@@ -40,7 +29,6 @@ const RecipeEditor = ({
   });
   const [editedRecipe, setEditedRecipe] = useState(recipe);
   const [finalIngredients, setFinalIngredients] = useState([]);
-  const [refarray, setRefArray] = useState();
   const [deletedIngredients, setDeletedIngredients] = useState([]);
   const [editedIngredients, setEditedIngredients] = useState(
     util_for_sort.sort((a, b) => a.order - b.order)
@@ -54,7 +42,7 @@ const RecipeEditor = ({
   });
   const [newRecipe, { createdRecipe }] = useMutation(NEW_RECIPE, {
     onCompleted(res) {
-      let a = client.writeQuery({
+      client.writeQuery({
         query: gql`
           query($id: ID!) {
             findChefByID(id: $id) {
@@ -167,7 +155,7 @@ const RecipeEditor = ({
   const save = (e) => {
     let inputIngredients = [];
     for (let i = 0; i < editedIngredients.length; i++) {
-      if (editedIngredients[i].ingredient._id || "" !== "") {
+      if ((editedIngredients[i].ingredient._id || "") !== "") {
         inputIngredients.push({
           id: editedIngredients[i]._id.startsWith("new")
             ? ""
@@ -220,7 +208,7 @@ const RecipeEditor = ({
         },
       });
     }
-    setEditedIngredients(inputIngredients);
+    setFinalIngredients(inputIngredients);
     e.preventDefault();
   };
 
@@ -323,7 +311,7 @@ const RecipeEditor = ({
               name="image"
               className="w-full"
               placeholder="www.cdn.com/my-image"
-              value={editedRecipe.image}
+              value={editedRecipe.image || ""}
               onChange={handleChange}
             ></input>
           </div>
@@ -487,20 +475,20 @@ const RecipeEditor = ({
       <div className="col-span-12 flex justify-center">
         {!recipe._id.startsWith("new") && (
           <button
-            className="m-8 border border-black funderline p-2"
+            className="mx-10 border border-black funderline p-2 hover:bg-red-400"
             onClick={del}
           >
             delete
           </button>
         )}
         <button
-          className="m-8 border border-black funderline p-2"
+          className="mx-10 border border-black funderline p-2"
           onClick={cancel}
         >
           cancel
         </button>
         <button
-          className="m-8 border border-black funderline p-2"
+          className="mx-10 border border-black funderline py-2 px-4 hover:bg-blue-400"
           onClick={save}
         >
           save
