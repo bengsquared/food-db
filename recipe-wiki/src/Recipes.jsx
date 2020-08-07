@@ -1,71 +1,104 @@
 import React, { useState } from "react";
+import Search from "./Search";
+import RecipeEditor from "./RecipeEditor";
+import RecipeViewer from "./RecipeViewer";
+import { useQuery } from "@apollo/client";
+import { Router, Link, navigate } from "@reach/router";
+import {
+  GET_FULL_RECIPE,
+  useCurrentToken,
+  useCurrentChefId,
+  recipeTemplate,
+} from "./serverfunctions";
 
-const Recipes = (user) => {
-  const [recipe, setRecipe] = useState("");
+const Recipes = () => {
+  const openRecipe = (id) => {
+    navigate(`/recipes/browse/${id}/`);
+    window.scrollTo({ top: 0 });
+  };
 
-  let result;
-  if (recipe == "") {
-    result = (
-      <div id="recipeviewer">
-        <h1> Recipes viewer</h1>
-        <Search />
-      </div>
-    );
-  } else {
-    result = (
-      <div id="recipeviewer">
-        <h1> Recipes viewer</h1>
-        <Search />
-      </div>
-    );
-  }
-  return result;
-};
+  const closeRecipe = () => {
+    navigate("/recipes/browse");
+    window.scrollTo({ top: 0 });
+  };
 
-const Search = () => {
-  const [searchTerm, setSearchTerm] = useState("search");
-  const searchresults = [
-    { key: "ok", title: "pasta", description: "the best dish" },
-    { key: "noway", title: "pizza", description: "the only dish" },
-  ];
-
-  const handleChange = (e) => {
-    if (e.target.getAttribute("name") === "searchbox") {
-      setSearchTerm(e.target.value);
-    }
-    e.preventDefault();
+  const newRecipe = () => {
+    navigate("/recipes/create");
   };
 
   return (
-    <div>
-      <div id="searchbox">
-        <input
-          name="searchbox"
-          value={searchTerm}
-          onChange={handleChange}
-        ></input>
-        <button name="search">Go</button>
-      </div>
-      <div>
-        <ul>
-          {searchresults.map((res) => (
-            <li key={res.key}>
-              <h2>{res.title}</h2>
-              <p>{res.description}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+    <Router>
+      <RecipeEditor
+        path="create"
+        recipe={recipeTemplate}
+        refetch={closeRecipe}
+        setEditing={closeRecipe}
+      />
+      <RecipePage path="browse/:id/*" closeRecipe={closeRecipe} />
+      <Search
+        path="browse"
+        openRecipe={openRecipe}
+        newRecipe={newRecipe}
+        default
+      />
+    </Router>
   );
 };
 
-const RecipeViewer = (recipe) => {
+const RecipePage = ({ id, closeRecipe }) => {
+  const token = useCurrentToken();
+  const [editing, setEditing] = useState(false);
+  const { loading, error, data, refetch } = useQuery(GET_FULL_RECIPE, {
+    context: {
+      headers: {
+        authorization: "Bearer " + token.token,
+      },
+    },
+    variables: {
+      id: id,
+    },
+  });
+
+  if (loading) {
+    return <div>loading...</div>;
+  } else if (!!error) {
+    return <div>{error.message}</div>;
+  } else if (data.findRecipeByID === null) {
+    return (
+      <div className="mx-20 mt-20 text-xl">
+        {"Not found :/"}
+        <br />
+        <Link to="/">
+          <u>take me home</u>
+        </Link>
+      </div>
+    );
+  }
+
+  const toggleEdit = () => {
+    editing
+      ? navigate(`/recipes/browse/${id}`)
+      : navigate(`/recipes/browse/${id}/edit`);
+    setEditing(!editing);
+  };
+
   return (
-    <div>
-      <div>{recipe.title}</div>
-      <div>{recipe.description}</div>
-    </div>
+    <Router>
+      <RecipeEditor
+        path="/edit"
+        recipe={data.findRecipeByID}
+        refetch={refetch}
+        closeRecipe={closeRecipe}
+        setEditing={toggleEdit}
+      />
+      <RecipeViewer
+        path="/"
+        setEditing={toggleEdit}
+        closeRecipe={closeRecipe}
+        recipe={data.findRecipeByID}
+        default
+      />
+    </Router>
   );
 };
 

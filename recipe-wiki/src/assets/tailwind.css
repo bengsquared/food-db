@@ -1,5 +1,71 @@
 @tailwind base;
 
+.funderline:after {
+  display: block;
+  content: "";
+  border-bottom: solid 1px;
+  transform: scaleX(0);
+  margin-top: -3px;
+  transition: transform 150ms ease-in-out;
+}
+
+.funderline:focus-within:after {
+  transform: scaleX(1);
+}
+
+.funderline:hover:after {
+  transform: scaleX(1);
+}
+
+.funky:hover {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url("./loginBackground.svg");
+}
+
+.funderline:after {
+  transform-origin: 0% 50%;
+}
+
+input {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+input:focus {
+  outline: none;
+}
+
+textarea:hover {
+  outline: solid grey 1px;
+}
+button:focus {
+  outline: none;
+}
+
+textarea:focus {
+  outline: solid black 1px;
+}
+
+.recipecard {
+  transition: box-shadow 250ms ease-in-out, transform 250ms ease-in-out;
+}
+
+.recipecard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 5px 0px rgba(0, 0, 0, 0.1),
+    0 1px 3px -1px rgba(0, 0, 0, 0.06);
+}
+pre {
+  font-size: 1rem;
+  font-family: monospace, monospace; /* 1 */
+  overflow-x: auto;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+
 @tailwind components;
 
 @tailwind utilities;

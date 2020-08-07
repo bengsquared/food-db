@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="414px" height="401px" viewBox="0 0 414 401" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Path</title>
+    <defs>
+        <linearGradient x1="6.07195334%" y1="-4.55559339%" x2="100%" y2="81.1727916%" id="linearGradient-1">
+            <stop stop-color="#FF7A00" offset="0%"></stop>
+            <stop stop-color="#B700F5" offset="46.1227829%"></stop>
+            <stop stop-color="#143F9A" offset="90.5325022%"></stop>
+            <stop stop-color="#0B4395" offset="100%"></stop>
+            <stop stop-color="#084494" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#FFFFFF" stop-opacity="0.5" offset="0%"></stop>
+            <stop stop-color="#FFFFFF" stop-opacity="0.0920290647" offset="100%"></stop>
+        </linearGradient>
+        <radialGradient cx="-3.96189916%" cy="103.903312%" fx="-3.96189916%" fy="103.903312%" r="96.8241511%" gradientTransform="translate(-0.039619,1.039033),scale(0.968599,1.000000),rotate(84.562076),scale(1.000000,1.017650),translate(0.039619,-1.039033)" id="radialGradient-3">
+            <stop stop-color="#FF9B0C" offset="0%"></stop>
+            <stop stop-color="#FF9700" stop-opacity="0.944019215" offset="30.152027%"></stop>
+            <stop stop-color="#FF9E00" stop-opacity="0" offset="100%"></stop>
+        </radialGradient>
+        <radialGradient cx="79.9844058%" cy="22.0192906%" fx="79.9844058%" fy="22.0192906%" r="64.3219975%" gradientTransform="translate(0.799844,0.220193),scale(0.968599,1.000000),rotate(90.000000),translate(-0.799844,-0.220193)" id="radialGradient-4">
+            <stop stop-color="#DB54FF" stop-opacity="0.588532561" offset="0%"></stop>
+            <stop stop-color="#E6BAFF" stop-opacity="0" offset="100%"></stop>
+        </radialGradient>
+        <radialGradient cx="48.0211976%" cy="113.684146%" fx="48.0211976%" fy="113.684146%" r="57.567355%" gradientTransform="translate(0.480212,1.136841),scale(0.968599,1.000000),rotate(68.636359),translate(-0.480212,-1.136841)" id="radialGradient-5">
+            <stop stop-color="#3683FF" offset="0%"></stop>
+            <stop stop-color="#015BFF" stop-opacity="0.574456292" offset="28.2549867%"></stop>
+            <stop stop-color="#004DE9" stop-opacity="0" offset="100%"></stop>
+        </radialGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-6">
+            <stop stop-color="#FFFFFF" stop-opacity="0.407697771" offset="0%"></stop>
+            <stop stop-color="#FFFFFF" stop-opacity="0.237871503" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-7" points="303.277562 0 414 0 414 401 -1.47082346e-12 401 -1.47082346e-12 0 111.139184 0"></polygon>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard-Copy-2">
+            <g id="Path">
+                <use fill="url(#linearGradient-1)" style="mix-blend-mode: multiply;" xlink:href="#path-7"></use>
+                <use fill="url(#linearGradient-2)" xlink:href="#path-7"></use>
+                <use fill="url(#radialGradient-3)" xlink:href="#path-7"></use>
+                <use fill="url(#radialGradient-4)" style="mix-blend-mode: multiply;" xlink:href="#path-7"></use>
+                <use fill="url(#radialGradient-5)" xlink:href="#path-7"></use>
+                <use fill="url(#linearGradient-6)" style="mix-blend-mode: lighten;" xlink:href="#path-7"></use>
+            </g>
+        </g>
+    </g>
+</svg>

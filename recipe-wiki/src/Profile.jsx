@@ -1,157 +1,219 @@
 import React, { useState } from "react";
-import { userUpdate } from "./user";
+import { useMutation, useQuery } from "@apollo/client";
+import { Router, navigate } from "@reach/router";
+import {
+  useCurrentToken,
+  useCurrentChefId,
+  GET_CHEF_PROFILE,
+  UPDATE_CHEF,
+} from "./serverfunctions";
 
-// export default class Profile extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       editing: false,
-//       chef: this.props.chef,
-//     };
-//     this.handleChange = this.handleChange.bind(this);
-//   }
-
-//   edit_profile() {
-//     this.setState({ editing: true });
-//   }
-
-//   handleChange(e) {
-//     if (e.target.name == "name") {
-//       let newchef = this.state.chef;
-//       newchef.name = e.target.value;
-//       this.setState({ chef: newchef });
-//     }
-//     if (e.target.name == "bio") {
-//       let newchef = this.state.chef;
-//       newchef.bio = e.target.value;
-//       this.setState({ chef: newchef });
-//     }
-//     e.preventDefault();
-//   }
-
-//   save_profile() {
-//     userUpdate(this.state.chef, this.props.onSave);
-//   }
-
-//   render() {
-//     let result = <div>hii</div>;
-//     if (this.state.editing) {
-//       result = (
-//         <div id="profile" class="editing">
-//           <ul>
-//             <li>username:{this.state.chef.username}</li>
-//             <li>
-//               <label>name:</label>
-//               <input
-//                 id="name"
-//                 name="name"
-//                 value={this.state.chef.name}
-//                 onChange={this.handleChange}
-//               />
-//             </li>
-
-//             <li>
-//               <label>bio:</label>
-//               <input
-//                 id="bio"
-//                 name="bio"
-//                 required
-//                 size="10"
-//                 value={this.state.chef.bio}
-//                 onChange={this.handleChange}
-//               />
-//             </li>
-//           </ul>
-//           <button
-//             name="save"
-//             onClick={this.save_profile.bind(this, this.props.onSave)}
-//           >
-//             {" "}
-//             edit{" "}
-//           </button>
-//         </div>
-//       );
-//     } else {
-//       result = (
-//         <div id="profile">
-//           <ul>
-//             <li>username:{this.state.chef.username}</li>
-//             <li>name:{this.state.chef.name}</li>
-//             <li>bio:{this.state.chef.bio}</li>
-//           </ul>
-//           <button name="edit" onClick={this.edit_profile.bind(this)}>
-//             {" "}
-//             edit{" "}
-//           </button>
-//         </div>
-//       );
-//     }
-//     return result;
-//   }
-// }
-
-const Profile = ({ onSave, user }) => {
+const Profile = ({ onSave }) => {
+  const token = useCurrentToken();
+  const chefid = useCurrentChefId();
   const [editing, setEditing] = useState(false);
-  const [chef, setChef] = useState(user);
+  console.log(chefid);
+  const { loading, error, data } = useQuery(GET_CHEF_PROFILE, {
+    context: {
+      headers: {
+        authorization: "Bearer " + token.token,
+      },
+    },
+    variables: {
+      id: chefid.currentUserID,
+    },
+  });
 
-  const editProfile = () => {
-    setEditing(true);
+  if (loading) {
+    console.log("loading");
+    return <div>loading...</div>;
+  } else if (!!error) {
+    return <div>{error.message}</div>;
+  }
+
+  const toggleEdit = (edit) => {
+    console.log(edit);
+    console.log(editing);
+    if (edit) {
+      navigate("/profile/me/edit");
+      console.log("/profile/me/edit");
+    } else {
+      navigate("/profile/me");
+      console.log("/profile/me");
+    }
+    setEditing(edit);
   };
+
+  return (
+    <Router>
+      <EditProfile
+        path="/edit"
+        chef={data.findChefByID}
+        setEditing={toggleEdit}
+        token={token}
+      />
+      <ViewProfile
+        path="/"
+        setEditing={toggleEdit}
+        chef={data.findChefByID}
+        default
+      />
+    </Router>
+  );
+};
+
+const EditProfile = ({ chef, setEditing }) => {
+  const [newChef, setNewChef] = useState(chef);
+  const token = useCurrentToken();
+  const [updateChef, { updatedChef }] = useMutation(UPDATE_CHEF, {
+    onCompleted(res) {
+      setEditing(false);
+    },
+  });
 
   const handleChange = (e) => {
     if (e.target.getAttribute("name") === "name") {
-      setChef({ ...chef, name: e.target.value });
+      setNewChef({ ...newChef, name: e.target.value });
     } else if (e.target.getAttribute("name") === "bio") {
-      setChef({ ...chef, bio: e.target.value });
+      setNewChef({ ...newChef, bio: e.target.value });
+    } else if (e.target.getAttribute("name") === "image") {
+      setNewChef({ ...newChef, image: e.target.value });
     }
     e.preventDefault();
   };
 
-  const saveProfile = () => {
-    userUpdate(chef, onSave);
-    setEditing(false);
-  };
-
-  return editing ? (
-    <div id="profile" className="editing">
-      <ul>
-        <li>username: {user.username}</li>
-        <li>
-          <label>name: </label>
+  return (
+    <div className="pb-10">
+      <img
+        className="mx-auto block border rounded h-64 w-64 object-contain mt-4"
+        src={
+          (newChef.image || "") !== ""
+            ? newChef.image
+            : "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/237/shallow-pan-of-food_1f958.png"
+        }
+        alt="profile avatar"
+      ></img>
+      <div className="w-2/3 mx-auto mb-8 text-xs ">
+        {"paste a link to change your picture: "}
+        <div className="funderline inline-block">
           <input
-            id="name"
-            name="name"
-            value={chef.name}
+            name="image"
+            className="w-full"
+            value={!!newChef.image ? newChef.image : ""}
             onChange={handleChange}
-          />
-        </li>
+          ></input>
+        </div>
+      </div>
 
-        <li>
-          <label>bio: </label>
-          <input
-            id="bio"
-            name="bio"
-            required
-            size="10"
-            value={chef.bio}
-            onChange={handleChange}
-          />
-        </li>
-      </ul>
-      <button name="save" onClick={saveProfile}>
-        save
-      </button>
+      <div className="mx-auto content-left flex-grow w-2/3 text-gray-600">
+        <pre className="inline">
+          your chef name is{" "}
+          <span className="text-green-700">{newChef.username}</span>, but what
+          should we call you?
+        </pre>
+        <div className="text-blue-700 flex sm:w-1/2 mt-2 mb-4">
+          {">"}
+          <div className="funderline ml-2 w-auto flex-grow">
+            <input
+              name="name"
+              className="w-full"
+              value={!!newChef.name ? newChef.name : ""}
+              onChange={handleChange}
+            ></input>
+          </div>
+        </div>
+
+        <pre>
+          ok,{" "}
+          <span className="text-blue-700">
+            {!!newChef.name ? newChef.name : ""}
+          </span>
+          , what do you have to say for yourself?
+        </pre>
+        <textarea
+          name="bio"
+          className="w-full p-3 h-56 text-black max-w-full mt-4 appearance-none"
+          placeholder="I only bake vegan chocolate croissants. always have, always will. It all began in the summer of '69..."
+          value={!!newChef.bio ? newChef.bio : ""}
+          onChange={handleChange}
+        ></textarea>
+        <pre>
+          <button
+            name="edit"
+            className="inline funderline p-2"
+            onClick={() => {
+              if (newChef === chef) {
+                setEditing(false);
+              } else {
+                updateChef({
+                  context: {
+                    headers: {
+                      authorization: "Bearer " + token.token,
+                    },
+                  },
+                  variables: {
+                    id: newChef._id,
+                    data: {
+                      name: newChef.name,
+                      username: newChef.username,
+                      bio: newChef.bio,
+                      image: newChef.image,
+                    },
+                  },
+                });
+              }
+            }}
+          >
+            [save]
+          </button>
+          {" or "}
+          <button
+            name="edit"
+            className="inline funderline p-2"
+            onClick={() => {
+              console.log("hit Cancel");
+              setEditing(false);
+            }}
+          >
+            [cancel]
+          </button>
+        </pre>
+      </div>
     </div>
-  ) : (
-    <div id="profile">
-      <ul>
-        <li>username: {user.username}</li>
-        <li>name: {chef.name}</li>
-        <li>bio: {chef.bio}</li>
-      </ul>
-      <button name="edit" onClick={editProfile}>
-        edit
-      </button>
+  );
+};
+
+const ViewProfile = ({ setEditing, chef }) => {
+  return (
+    <div className="pb-10">
+      <img
+        className="mx-auto block rounded h-64 w-64 my-8 object-contain "
+        src={
+          chef.image === ""
+            ? "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/237/shallow-pan-of-food_1f958.png"
+            : chef.image
+        }
+        alt="profile avatar"
+      ></img>
+      <div className="mx-auto flex-grow w-2/3 text-gray-600">
+        <pre className="max-w-full ">
+          {"This is "}
+          <span className="text-blue-700">{chef.name}</span>
+          {", otherwise known as Chef "}
+          <span className="text-green-700">{chef.username}</span>
+          {".\n"}
+          <span className="text-gray-700">{chef.bio}</span>
+        </pre>
+        <button
+          name="edit"
+          className="inline funderline p-2"
+          onClick={() => {
+            setEditing(true);
+          }}
+        >
+          [edit]
+        </button>
+      </div>
     </div>
   );
 };
