@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { gql, useApolloClient, useMutation } from "@apollo/client";
 import {
   UPDATE_RECIPE,
@@ -27,6 +27,7 @@ const RecipeEditor = ({
   util_for_sort = util_for_sort.map((row) => {
     return { ...row, ref: React.createRef() };
   });
+  const [addedIngredient, setAddedIngredient] = useState(false);
   const [editedRecipe, setEditedRecipe] = useState(recipe);
   const [finalIngredients, setFinalIngredients] = useState([]);
   const [deletedIngredients, setDeletedIngredients] = useState([]);
@@ -105,6 +106,16 @@ const RecipeEditor = ({
       closeRecipe();
     },
   });
+
+  useEffect(() => {
+    if (
+      addedIngredient &&
+      editedIngredients[editedIngredients.length - 1].ref.current
+    ) {
+      editedIngredients[editedIngredients.length - 1].ref.current.focus();
+      setAddedIngredient(false);
+    }
+  }, [addedIngredient, editedIngredients]);
 
   const handleChange = (e) => {
     let h = Math.floor(editedRecipe.time === "" ? "0" : editedRecipe.time / 60);
@@ -255,9 +266,11 @@ const RecipeEditor = ({
       amount: "",
       notes: "",
       order: editedIngredients.length,
+      ref: React.createRef(),
     };
     let ingredientList = [...editedIngredients, template];
     setEditedIngredients(ingredientList);
+    setAddedIngredient(true);
   };
 
   const onDragEnd = (result) => {
