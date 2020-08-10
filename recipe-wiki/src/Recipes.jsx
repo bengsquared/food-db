@@ -60,7 +60,7 @@ const RecipePage = ({ id, closeRecipe }) => {
   });
 
   if (loading) {
-    return <div>loading...</div>;
+    return <div className="linear-wipe w-full h-full"></div>;
   } else if (!!error) {
     return <div>{error.message}</div>;
   } else if (data.findRecipeByID === null) {

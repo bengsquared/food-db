@@ -55,6 +55,7 @@ textarea:focus {
   box-shadow: 0 3px 5px 0px rgba(0, 0, 0, 0.1),
     0 1px 3px -1px rgba(0, 0, 0, 0.06);
 }
+
 pre {
   font-size: 1rem;
   font-family: monospace, monospace; /* 1 */
@@ -64,6 +65,43 @@ pre {
   white-space: -pre-wrap;
   white-space: -o-pre-wrap;
   word-wrap: break-word;
+}
+
+.linear-wipe {
+  background: linear-gradient(
+    to right,
+    #f7f7f7,
+    #f7f7f7 5%,
+    #f0f2f4 15%,
+    #f7f7f7 25%,
+    #f7f7f7
+  );
+  background-size: 400% auto;
+  color: #fff;
+  text-fill-color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: shine 4s linear infinite;
+}
+
+@-webkit-keyframes shine {
+  100% {
+    background-position: 400% center;
+  }
+}
+@-moz-keyframes shine {
+  100% {
+    background-position: 400% center;
+  }
+}
+@-o-keyframes shine {
+  100% {
+    background-position: 400% center;
+  }
+}
+@keyframes shine {
+  100% {
+    background-position: 400% center;
+  }
 }
 
 @tailwind components;
