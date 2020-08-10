@@ -230,7 +230,7 @@ const RecipeEditor = ({
       setDeletedIngredients(dtemplist);
     }
     let etemplist = [...editedIngredients];
-    etemplist.splice(dex);
+    etemplist.splice(dex, 1);
     for (let x = 0; x < etemplist.length; x++) {
       etemplist[x] = { ...etemplist[x], order: x };
     }
@@ -282,7 +282,7 @@ const RecipeEditor = ({
   };
 
   return (
-    <div className="grid grid-cols-12 gap-4 p-8 relative lg:w-2/3 mx-auto ">
+    <div className="grid grid-cols-12 gap-4 p-8 relative w-full xl:w-2/3 mx-auto ">
       <div className="col-span-12 flex flex-col md:flex-row-reverse">
         <button
           className="md:flex-none align-center border px-4 w-auto border-black h-10 mb-4"
@@ -462,7 +462,7 @@ const RecipeEditor = ({
           </button>
         </DragDropContext>
         <div className="mx-auto text-xl text-center mb-4">Instructions:</div>
-        <div className="mx-auto w-2/3 sm:w-1/2 md:w-1/2 ">
+        <div className="mx-auto w-full lg:w-2/3 ">
           <textarea
             name="instructions"
             rows="15"

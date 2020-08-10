@@ -196,8 +196,9 @@ const IngredientPicker = React.forwardRef(
                         (dex === chosenel ? " bg-gray-400" : "")
                       }
                       key={l._id}
-                      onClick={() => {
+                      onClick={(e) => {
                         chooseIngredient(l._id, l.name);
+                        e.preventDefault();
                       }}
                     >
                       {singular ? l.name : pluralize.plural(l.name)}
@@ -212,7 +213,10 @@ const IngredientPicker = React.forwardRef(
                     (allowCreate && searchTerm !== "" ? "" : "hidden") +
                     (chosenel === searchList.length ? " bg-gray-400" : "")
                   }
-                  onClick={create}
+                  onClick={(e) => {
+                    create();
+                    e.preventDefault();
+                  }}
                 >
                   {"create ingredient "}
                   {searchTerm.toLowerCase()}
