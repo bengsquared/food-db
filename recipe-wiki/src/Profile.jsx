@@ -26,7 +26,7 @@ const Profile = ({ onSave }) => {
 
   if (loading) {
     console.log("loading");
-    return <div>loading...</div>;
+    return <LoadingProfile />;
   } else if (!!error) {
     return <div>{error.message}</div>;
   }
@@ -43,7 +43,6 @@ const Profile = ({ onSave }) => {
     }
     setEditing(edit);
   };
-
   return (
     <Router>
       <EditProfile
@@ -213,6 +212,18 @@ const ViewProfile = ({ setEditing, chef }) => {
         >
           [edit]
         </button>
+      </div>
+    </div>
+  );
+};
+
+const LoadingProfile = () => {
+  return (
+    <div className="pb-10">
+      <div className="mx-auto block rounded h-64 w-64 my-8 linear-wipe"></div>
+      <div className="mx-auto flex-grow w-2/3 ">
+        <pre className="max-w-full linear-wipe ">{"\n"}</pre>
+        <pre className="max-w-full mt-1linear-wipe ">{"\n \n \n \n"}</pre>
       </div>
     </div>
   );

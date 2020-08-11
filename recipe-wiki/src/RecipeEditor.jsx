@@ -475,10 +475,11 @@ const RecipeEditor = ({
           </button>
         </DragDropContext>
         <div className="mx-auto text-xl text-center mb-4">Instructions:</div>
-        <div className="mx-auto w-full lg:w-2/3 ">
+        <div className="mx-auto w-full xl:w-2/3">
           <textarea
             name="instructions"
             rows="15"
+            aria-label="instructions"
             className="w-full p-3"
             value={editedRecipe.instructions || ""}
             onChange={handleChange}

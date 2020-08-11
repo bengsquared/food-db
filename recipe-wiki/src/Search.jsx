@@ -6,7 +6,6 @@ import {
   useCurrentChefId,
   foodemoji,
 } from "./serverfunctions";
-
 const Search = ({ openRecipe, newRecipe }) => {
   const token = useCurrentToken();
   const chefid = useCurrentChefId();
@@ -80,16 +79,22 @@ const Search = ({ openRecipe, newRecipe }) => {
           new recipe
         </button>
       </div>
-      <div className="col-span-12 h-full overflow-y-show grid gap-4">
-        {!!loading ? (
-          <div> {"Loading..."} </div>
-        ) : !!error ? (
-          <div> {String(Error)} </div>
-        ) : searchTerm === "" && data.findChefByID.recipes.data.length > 0 ? (
-          data.findChefByID.recipes.data.map((res) => (
-            <ResultCard key={res._id} res={res} openRecipe={openRecipe} />
-          ))
-        ) : data.findChefByID.recipes.data.length === 0 ? (
+      {!!loading ? (
+        <div className="col-span-12 h-full overflow-y-show grid gap-4">
+          <div className="linear-wipe col-span-12 h-40"></div>
+          <div className="linear-wipe col-span-12 h-40"></div>
+          <div className="linear-wipe col-span-12 h-40"></div>
+          <div className="linear-wipe col-span-12 h-40"></div>
+          <div className="linear-wipe col-span-12 h-40"></div>
+        </div>
+      ) : !!error ? (
+        <div> {String(Error)} </div>
+      ) : searchTerm === "" && data.findChefByID.recipes.data.length > 0 ? (
+        data.findChefByID.recipes.data.map((res) => (
+          <ResultCard key={res._id} res={res} openRecipe={openRecipe} />
+        ))
+      ) : data.findChefByID.recipes.data.length === 0 ? (
+        <div className="col-span-12 h-full overflow-y-show grid gap-4">
           <div className="w-full text-center text-md p-4">
             <h2>
               {"you don't have any recipes right now, you should put some in!"}
@@ -99,16 +104,18 @@ const Search = ({ openRecipe, newRecipe }) => {
               </button>
             </h2>
           </div>
-        ) : currentList.length === 0 ? (
-          <div>
-            <h2>No Matching Recipes :(</h2>
-          </div>
-        ) : (
-          currentList.map((res) => (
+        </div>
+      ) : currentList.length === 0 ? (
+        <div>
+          <h2>No Matching Recipes :(</h2>
+        </div>
+      ) : (
+        <div className="col-span-12 h-full overflow-y-show grid gap-4">
+          {currentList.map((res) => (
             <ResultCard key={res._id} res={res} openRecipe={openRecipe} />
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

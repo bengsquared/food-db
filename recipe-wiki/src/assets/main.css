@@ -645,6 +645,28 @@ pre {
   word-wrap: break-word;
 }
 
+.linear-wipe {
+  background: linear-gradient(
+    to right,
+    #f7f7f7,
+    #f7f7f7 5%,
+    #f0f2f4 15%,
+    #f7f7f7 25%,
+    #f7f7f7
+  );
+  background-size: 400% auto;
+  color: #fff;
+  text-fill-color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: shine 4s linear infinite;
+}
+
+@keyframes shine {
+  100% {
+    background-position: 400% center;
+  }
+}
+
 .container {
   width: 100%;
 }
