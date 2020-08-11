@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import html2pdf from "html2pdf.js";
 import { foodemoji } from "./serverfunctions";
 
 const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
@@ -6,14 +7,50 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
   ingredientsSorted.sort((a, b) => {
     return a.order - b.order;
   });
+  const recipeRef = React.createRef();
+  const imageRef = React.createRef();
+  const fileTitle = recipe.title.replace(/(\/|\s|\.)/g, "_");
+  const opt = {
+    margin: 0.25,
+    pagebreak: ["avoid-all"],
+    filename: `${fileTitle}.pdf`,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: {
+      useCORS: true,
+      allowTaint: true,
+      scale: 4,
+      windowWidth: 769,
+      x: 0,
+      y: 0,
+      scrollX: 0,
+      scrollY: 0,
+    },
+    jsPDF: {
+      unit: "in",
+      format: "letter",
+      orientation: "portrait",
+    },
+  };
+
+  const worker = html2pdf().set(opt);
+
   const edit = () => {
     setEditing(true);
   };
+
+  const print = () => {
+    worker.from(recipeRef.current).save();
+  };
+
   return (
-    <div className="grid grid-cols-12 gap-4 p-8 relative lg:w-2/3 mx-auto">
+    <div
+      className="grid grid-cols-12 gap-4 p-8 relative lg:w-2/3 mx-auto"
+      ref={recipeRef}
+    >
       <button
         className="absolute align-center px-4  sm:border sm:border-black h-10 top-0 right-0 m-6 sm:m-8 "
         onClick={closeRecipe}
+        data-html2canvas-ignore
       >
         <svg
           className="inline stroke-current sm:hidden w-4 h-4 block"
@@ -26,7 +63,7 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
         </svg>
         <p className="hidden funderline sm:inline">close</p>
       </button>
-      <div className="col-span-12 flex text-xl sm:justify-center sm:text-2xl mb-8">
+      <div className="col-span-12 flex text-xl sm:justify-center sm:text-3xl mb-8">
         <div className="w-3/4 sm:w-2/3 sm:text-center ">{recipe.title}</div>
       </div>
 
@@ -44,17 +81,19 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
           </span>
         </div>
       ) : (
-        <div className="col-span-12 h-64 md:col-span-4">
-          <img
-            alt="finished dish"
-            className="object-contain w-full h-full object-center"
-            src={recipe.image}
-          ></img>
+        <div className="col-span-12 h-64 flex md:col-span-4">
+          <div className="h-full flex self-center">
+            <img
+              alt="finished dish"
+              className="object-contain object-center"
+              src={recipe.image}
+            ></img>
+          </div>
         </div>
       )}
       <div
         className={
-          "flex flex-col col-span-12 p-4 border " +
+          "flex flex-col col-span-12 p-4 border text-sm " +
           (recipe.image === "" ? "" : " md:col-span-8")
         }
       >
@@ -65,12 +104,12 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
           {Math.floor(recipe.time / 60)}h:{recipe.time % 60}m{" "}
         </p>
         <br />
-        <p className="text-base">{recipe.description}</p>
+        <pre>{recipe.description}</pre>
         <br />
       </div>
-      <div className="col-span-12 border align-center p-8">
+      <div className="col-span-12 border align-center p-4">
         <div className="mx-auto text-xl mb-4 w-2/3">Ingredients:</div>
-        <pre className="mx-auto w-2/3 ">
+        <pre className="mx-auto w-2/3 text-sm">
           {ingredientsSorted.map((i) => (
             <div key={i._id}>
               {"-> "}
@@ -81,16 +120,24 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
           ))}
         </pre>
       </div>
-      <div className="col-span-12 align-center p-8">
+      <div className="col-span-12 align-center p-4">
         <div className="mx-auto text-xl mb-4 w-2/3 mb-8">Instructions:</div>
-        <pre className="mx-auto w-2/3 ">{recipe.instructions}</pre>
+        <pre id="instructions" className="mx-auto w-2/3 text-sm">
+          {recipe.instructions}
+        </pre>
       </div>
-      <div className="col-span-12 flex justify-center">
+      <div className="col-span-12 flex justify-center" data-html2canvas-ignore>
         <button
-          className="border px-4 border-black h-10 funderline"
+          className="border px-4 mx-4 border-black h-10 funderline"
           onClick={edit}
         >
           edit
+        </button>
+        <button
+          className="border px-4 mx-4 border-black h-10 funderline"
+          onClick={print}
+        >
+          save as pdf
         </button>
       </div>
     </div>

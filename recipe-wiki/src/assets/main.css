@@ -646,25 +646,24 @@ pre {
 }
 
 .linear-wipe {
-  height: 100vh;
-  width: 100%;
   background: linear-gradient(
     to right,
-    #b5bde1 10%,
-    #b5bde1 80%,
-    #cfd3e1 85%,
-    #b5bde1 100%
+    #f7f7f7,
+    #f7f7f7 5%,
+    #f0f2f4 15%,
+    #f7f7f7 25%,
+    #f7f7f7
   );
   background-size: 400% auto;
   color: #fff;
   text-fill-color: transparent;
   -webkit-text-fill-color: transparent;
-  animation: shine 2s linear infinite;
+  animation: shine 4s linear infinite;
 }
 
 @keyframes shine {
   100% {
-    background-position: 200% center;
+    background-position: 400% center;
   }
 }
 
