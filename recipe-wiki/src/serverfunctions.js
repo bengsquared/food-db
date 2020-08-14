@@ -36,6 +36,11 @@ export const GET_CHEF_RECIPES = gql`
           description
           time
           image
+          ingredients {
+            data {
+              name
+            }
+          }
         }
       }
     }
@@ -69,6 +74,11 @@ export const MAIN_FETCH = gql`
           description
           time
           image
+          ingredients {
+            data {
+              name
+            }
+          }
         }
       }
     }
@@ -128,8 +138,13 @@ export const GET_FULL_RECIPE = gql`
           order
         }
       }
+      chef {
+        _id
+        username
+      }
       time
       image
+      public
     }
   }
 `;
@@ -143,6 +158,7 @@ export const recipeTemplate = {
   instructions: "Step 1:\n\n\nStep 2:\n\n\nStep 3:\n\n\n",
   ingredients: { data: [] },
   time: 15,
+  public: false,
 };
 
 export const UPDATE_CHEF = gql`
@@ -211,12 +227,12 @@ export const DELETE_RECIPE = gql`
 
 export function useLoginStatus() {
   const { data } = useQuery(IS_LOGGED_IN);
-  return data;
+  return data || false;
 }
 
 export function useCurrentChefId() {
   const { data } = useQuery(GET_CURRENT_USER_ID);
-  return data;
+  return data || { currentUserID: null };
 }
 
 export function useCurrentToken() {

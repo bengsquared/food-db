@@ -1,8 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import html2pdf from "html2pdf.js";
-import { foodemoji } from "./serverfunctions";
+import { foodemoji, useCurrentChefId } from "./serverfunctions";
 
 const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
+  const chef = useCurrentChefId();
+  const [copied, setCopied] = useState(false);
+  const [pdfHover, setPdfHover] = useState(false);
+  const [linkHover, setLinkHover] = useState(false);
   const ingredientsSorted = [...recipe.ingredients.data];
   ingredientsSorted.sort((a, b) => {
     return a.order - b.order;
@@ -10,6 +14,15 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
   const recipeRef = React.createRef();
   const imageRef = React.createRef();
   const fileTitle = recipe.title.replace(/(\/|\s|\.)/g, "_");
+  let h =
+    769 *
+    ((window.innerHeight ||
+      document.documentElement.clientHeight ||
+      document.body.clientHeight) /
+      (window.innerWidth ||
+        document.documentElement.clientWidth ||
+        document.body.clientWidth));
+
   const opt = {
     margin: 0.25,
     pagebreak: ["avoid-all"],
@@ -26,7 +39,6 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
       scrollY: 0,
     },
     jsPDF: {
-      unit: "in",
       format: "letter",
       orientation: "portrait",
     },
@@ -34,12 +46,24 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
 
   const worker = html2pdf().set(opt);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const edit = () => {
     setEditing(true);
   };
 
   const print = () => {
     worker.from(recipeRef.current).save();
+  };
+
+  const clickToCopy = (e) => {
+    navigator.clipboard.writeText(
+      `https://${window.location.host}/share/recipes/${recipe._id}`
+    );
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -63,8 +87,22 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
         </svg>
         <p className="hidden funderline sm:inline">close</p>
       </button>
-      <div className="col-span-12 flex text-xl sm:justify-center sm:text-3xl mb-8">
+      <div className="col-span-12 flex text-xl sm:justify-center sm:text-3xl mb-1">
         <div className="w-3/4 sm:w-2/3 sm:text-center ">{recipe.title}</div>
+      </div>
+      <div className="col-span-12 flex mb-6 sm:justify-center">
+        <div className=" sm:w-2/3 sm:text-center text-sm">
+          <p>
+            {"a "}
+            <span className="text-blue-700 font-bold">
+              {!recipe.public ? "private" : "public"}
+            </span>
+            {" recipe by chef "}
+            <span className="text-green-700 font-bold">
+              {recipe.chef.username}
+            </span>
+          </p>
+        </div>
       </div>
 
       {recipe.image === "" ? (
@@ -97,6 +135,39 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
           (recipe.image === "" ? "" : " md:col-span-8")
         }
       >
+        <div className="flex text-xs" data-html2canvas-ignore>
+          <span role="button" className="pr-3 funderline" onClick={print}>
+            <span role="img" aria-label="download pdf">
+              📄
+            </span>
+            {" download pdf"}
+          </span>
+
+          {recipe.public ? (
+            copied ? (
+              <span className="text-green-700 bold pl-3">
+                <span role="img" aria-label="copy shareable link">
+                  ✅
+                </span>
+                {" copied!"}
+              </span>
+            ) : (
+              <span
+                role="button"
+                className="px-3 funderline"
+                onClick={clickToCopy}
+              >
+                <span role="img" aria-label="link">
+                  🔗
+                </span>
+                {" copy shareable link"}
+              </span>
+            )
+          ) : (
+            ""
+          )}
+        </div>
+        <br />
         <p>
           <span role="img" aria-label="time">
             ⏱
@@ -104,8 +175,7 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
           {Math.floor(recipe.time / 60)}h:{recipe.time % 60}m{" "}
         </p>
         <br />
-        <pre>{recipe.description}</pre>
-        <br />
+        <pre className="text-sm">{recipe.description}</pre>
       </div>
       <div className="col-span-12 border align-center p-4">
         <div className="mx-auto text-xl mb-4 w-2/3">Ingredients:</div>
@@ -127,18 +197,16 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
         </pre>
       </div>
       <div className="col-span-12 flex justify-center" data-html2canvas-ignore>
-        <button
-          className="border px-4 mx-4 border-black h-10 funderline"
-          onClick={edit}
-        >
-          edit
-        </button>
-        <button
-          className="border px-4 mx-4 border-black h-10 funderline"
-          onClick={print}
-        >
-          save as pdf
-        </button>
+        {recipe.chef._id === (chef || { currentUserID: null }).currentUserID ? (
+          <button
+            className="border px-4 mx-4 border-black h-10 funderline"
+            onClick={edit}
+          >
+            edit
+          </button>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

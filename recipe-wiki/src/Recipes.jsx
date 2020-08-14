@@ -14,12 +14,10 @@ import {
 const Recipes = () => {
   const openRecipe = (id) => {
     navigate(`/recipes/browse/${id}/`);
-    window.scrollTo({ top: -20 });
   };
 
   const closeRecipe = () => {
     navigate("/recipes/browse");
-    window.scrollTo({ top: -20 });
   };
 
   const newRecipe = () => {

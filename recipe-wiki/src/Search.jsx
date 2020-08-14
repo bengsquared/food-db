@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import {
   useCurrentToken,
@@ -29,6 +29,10 @@ const Search = ({ openRecipe, newRecipe }) => {
     e.preventDefault();
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const searchFilter = (term) => {
     if (!!data && term !== "") {
       let terms_processed = new RegExp(term.trim().replace(/\W+/g, "|"), "gi");
@@ -37,7 +41,15 @@ const Search = ({ openRecipe, newRecipe }) => {
       let datalist = [];
       let relevance = 0;
       for (let r of rec) {
-        concat = String(r.title) + " " + String(r.description);
+        concat =
+          String(r.title) +
+          " " +
+          String(r.description) +
+          String(
+            r.ingredients.data.map((el) => {
+              return " " + String(el.name);
+            })
+          );
         relevance = concat.match(terms_processed);
         if (!!relevance) {
           datalist.push({ ...r, rel: relevance.length });

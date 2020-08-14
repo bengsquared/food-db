@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { Router, navigate } from "@reach/router";
 import {
@@ -23,6 +23,10 @@ const Profile = ({ onSave }) => {
       id: chefid.currentUserID,
     },
   });
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   if (loading) {
     console.log("loading");
@@ -98,6 +102,7 @@ const EditProfile = ({ chef, setEditing }) => {
           <input
             name="image"
             className="w-full"
+            maxLength="600"
             value={!!newChef.image ? newChef.image : ""}
             onChange={handleChange}
           ></input>
@@ -115,6 +120,7 @@ const EditProfile = ({ chef, setEditing }) => {
           <div className="funderline ml-2 w-auto flex-grow">
             <input
               name="name"
+              maxLength="60"
               className="w-full"
               value={!!newChef.name ? newChef.name : ""}
               onChange={handleChange}
@@ -131,6 +137,7 @@ const EditProfile = ({ chef, setEditing }) => {
         </pre>
         <textarea
           name="bio"
+          maxLength="6000"
           className="w-full p-3 h-56 text-black max-w-full mt-4 appearance-none"
           placeholder="I only bake vegan chocolate croissants. always have, always will. It all began in the summer of '69..."
           value={!!newChef.bio ? newChef.bio : ""}

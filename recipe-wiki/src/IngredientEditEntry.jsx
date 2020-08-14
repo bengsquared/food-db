@@ -50,7 +50,7 @@ const IngredientEditEntry = React.forwardRef((props, ref) => {
             src={handle}
           ></img>
           <label className="sm:hidden">amount:</label>
-          <div className="inline funderline">
+          <div className="inline funderline overflow-hidden">
             <input
               placeholder="2 cups"
               name="amount"
@@ -72,7 +72,7 @@ const IngredientEditEntry = React.forwardRef((props, ref) => {
           notesfocus={notesfocus}
           ref={ingredientref}
         />
-        <div className="col-span-12 flex sm:block p-2 sm:p-4 sm:col-span-5">
+        <div className="col-span-12 flex sm:block p-2 sm:p-4 sm:col-span-5 overflow-hidden">
           <label className="sm:hidden">notes:</label>
           <div className="inline funderline">
             <input

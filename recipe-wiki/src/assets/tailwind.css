@@ -38,8 +38,17 @@ input:focus {
 textarea:hover {
   outline: solid grey 1px;
 }
+
+.tb:hover {
+  outline: solid grey 1px;
+}
+
 button:focus {
   outline: none;
+}
+
+.tb:focus {
+  outline: solid black 1px;
 }
 
 textarea:focus {
@@ -65,6 +74,7 @@ pre {
   white-space: -pre-wrap;
   white-space: -o-pre-wrap;
   word-wrap: break-word;
+  break-inside: avoid-region;
 }
 
 .linear-wipe {

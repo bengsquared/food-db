@@ -117,29 +117,47 @@ const RecipeEditor = ({
     }
   }, [addedIngredient, editedIngredients]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  if (chef.currentUserID !== recipe.chef._id) {
+    navigate(`/recipes/browse/${recipe._id}`);
+  }
+
   const handleChange = (e) => {
-    let h = Math.floor(editedRecipe.time === "" ? "0" : editedRecipe.time / 60);
-    let m = editedRecipe.time === "" ? "0" : editedRecipe.time % 60;
     if (e.target.getAttribute("name") === "title") {
       setEditedRecipe({ ...editedRecipe, title: e.target.value });
+      e.preventDefault();
     } else if (e.target.getAttribute("name") === "image") {
       setEditedRecipe({ ...editedRecipe, image: e.target.value });
+      e.preventDefault();
     } else if (e.target.getAttribute("name") === "minutes") {
+      let h = Math.floor(
+        editedRecipe.time === "" ? "0" : editedRecipe.time / 60
+      );
       setEditedRecipe({
         ...editedRecipe,
         time: parseInt(e.target.value === "" ? "0" : e.target.value) + 60 * h,
       });
+      e.preventDefault();
     } else if (e.target.getAttribute("name") === "hours") {
+      let m = editedRecipe.time === "" ? "0" : editedRecipe.time % 60;
       setEditedRecipe({
         ...editedRecipe,
         time: parseInt(e.target.value === "" ? "0" : e.target.value) * 60 + m,
       });
+      e.preventDefault();
     } else if (e.target.getAttribute("name") === "description") {
       setEditedRecipe({ ...editedRecipe, description: e.target.value });
+      e.preventDefault();
     } else if (e.target.getAttribute("name") === "instructions") {
       setEditedRecipe({ ...editedRecipe, instructions: e.target.value });
+      e.preventDefault();
+    } else if (e.target.getAttribute("name") === "public") {
+      e.persist();
+      setEditedRecipe({ ...editedRecipe, public: e.target.checked });
     }
-    e.preventDefault();
   };
 
   const del = (e) => {
@@ -189,6 +207,7 @@ const RecipeEditor = ({
         instructions: editedRecipe.instructions,
         time: editedRecipe.time,
         image: editedRecipe.image,
+        public: editedRecipe.public || false,
       };
       newRecipe({
         context: {
@@ -213,6 +232,7 @@ const RecipeEditor = ({
             instructions: editedRecipe.instructions,
             time: editedRecipe.time,
             image: editedRecipe.image,
+            public: editedRecipe.public,
           },
           delete: deletedIngredients === [] ? null : deletedIngredients,
           update: inputIngredients === [] ? null : inputIngredients,
@@ -362,7 +382,7 @@ const RecipeEditor = ({
               <img
                 alt="finished dish"
                 className="object-contain w-full h-full object-center"
-                src={recipe.image}
+                src={editedRecipe.image}
               ></img>
               <button
                 className="text-xs"
@@ -383,32 +403,45 @@ const RecipeEditor = ({
         </div>
       </div>
       <div className="flex flex-col col-span-12 md:col-span-8 p-4 border">
-        <div className="flex-none">
-          {"Total time: "}
-          <input
-            type="number"
-            name="hours"
-            size="4"
-            className="w-10 appearance-none"
-            value={parseInt(Math.floor((editedRecipe.time || 0) / 60))}
-            onChange={handleChange}
-          ></input>
-          {"h, "}
-          <input
-            type="number"
-            name="minutes"
-            size="4"
-            className="w-10 appearance-none"
-            value={parseInt((editedRecipe.time || 0) % 60)}
-            onChange={handleChange}
-          ></input>
-          {"m"}
+        <div className="flex-none flex">
+          <div className="flex-grow">
+            {"Total time: "}
+            <input
+              type="number"
+              name="hours"
+              size="4"
+              className="w-10 appearance-none"
+              value={parseInt(Math.floor((editedRecipe.time || 0) / 60))}
+              onChange={handleChange}
+            ></input>
+            {"h, "}
+            <input
+              type="number"
+              name="minutes"
+              size="4"
+              className="w-10 appearance-none"
+              value={parseInt((editedRecipe.time || 0) % 60)}
+              onChange={handleChange}
+            ></input>
+            {"m"}
+          </div>
+          <label className="bold">
+            {"public? "}
+            <input
+              name="public"
+              type="checkbox"
+              checked={editedRecipe.public || false}
+              onChange={handleChange}
+            />
+          </label>
         </div>
-        <div>
+        <div className=" ">
           description:{" "}
           <textarea
             name="description"
-            className="w-full p-3"
+            rows="5"
+            maxLength="500"
+            className="w-full h-full p-3"
             onChange={handleChange}
             value={editedRecipe.description || ""}
           ></textarea>
@@ -478,11 +511,12 @@ const RecipeEditor = ({
         <div className="mx-auto w-full xl:w-2/3">
           <textarea
             name="instructions"
-            rows="15"
             aria-label="instructions"
-            className="w-full p-3"
-            value={editedRecipe.instructions || ""}
+            className="w-full p-3 tb"
+            rows="20"
+            maxLength="100000"
             onChange={handleChange}
+            value={editedRecipe.instructions || ""}
           ></textarea>
         </div>
       </div>

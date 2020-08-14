@@ -143,13 +143,13 @@ const IngredientPicker = React.forwardRef(
     };
 
     return (
-      <div className="col-span-12 sm:col-span-3 flex content-center p-2 ">
+      <div className="col-span-12 sm:col-span-3 flex content-center p-2">
         <div className="w-full sm:hidden">ingredient:</div>
         <div
           className={
             editingName
               ? "border border-black bg-white rounded-lg p-2 absolute my-auto"
-              : "px-2 w-full sm:my-auto"
+              : "px-2 w-full sm:my-auto overflow-hidden"
           }
           onFocus={onFocusHandler}
           onBlur={onBlurHandler}
