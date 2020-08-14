@@ -437,15 +437,14 @@ const RecipeEditor = ({
         </div>
         <div className=" ">
           description:{" "}
-          <pre
-            role="textbox"
+          <textarea
             name="description"
-            className="w-full h-full p-3 tb"
+            rows="5"
+            maxLength="500"
+            className="w-full h-full p-3"
             onChange={handleChange}
-            contentEditable
-          >
-            {editedRecipe.description || ""}
-          </pre>
+            value={editedRecipe.description || ""}
+          ></textarea>
         </div>
       </div>
 
@@ -510,16 +509,15 @@ const RecipeEditor = ({
         </DragDropContext>
         <div className="mx-auto text-xl text-center mb-4">Instructions:</div>
         <div className="mx-auto w-full xl:w-2/3">
-          <pre
-            role="textbox"
+          <textarea
             name="instructions"
             aria-label="instructions"
             className="w-full p-3 tb"
+            rows="20"
+            maxLength="100000"
             onChange={handleChange}
-            contentEditable
-          >
-            {editedRecipe.instructions || ""}
-          </pre>
+            value={editedRecipe.instructions || ""}
+          ></textarea>
         </div>
       </div>
       <div className="col-span-12 flex justify-center">

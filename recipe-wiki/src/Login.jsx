@@ -102,6 +102,7 @@ const LoginScreen = ({ onLogin, navigate }) => {
         <div className="block funderline">
           <input
             id="username"
+            maxLength="100"
             name="username"
             className="w-full"
             size="10"
@@ -113,6 +114,7 @@ const LoginScreen = ({ onLogin, navigate }) => {
         <div className="block funderline pt-5">
           <input
             id="password"
+            maxLength="100"
             name="password"
             size="10"
             className="w-full"
@@ -257,6 +259,7 @@ const SignUpScreen = ({ onLogin, navigate }) => {
             id="username"
             name="username"
             size="10"
+            maxLength="100"
             className="w-full"
             placeholder="username"
             value={username}
@@ -284,6 +287,7 @@ const SignUpScreen = ({ onLogin, navigate }) => {
             id="cred"
             className="w-full"
             ref={pref}
+            maxLength="100"
             name="password"
             size="10"
             type="password"
