@@ -1,6 +1,7 @@
 import React from "react";
 import Main from "./Main";
 import Login from "./Login";
+import ShareRecipe from "./ShareRecipe";
 import { useApolloClient, gql } from "@apollo/client";
 import { defaultToken } from "./constants";
 import { Router, navigate, Redirect } from "@reach/router";
@@ -74,6 +75,7 @@ const App = () => {
     <Router>
       <Main className="container min-h-screen" path="/*" />
       <Login onLogin={login} path="/login/*" />
+      <ShareRecipe path="/share/recipes/:id" />
       <Redirect noThrow from="/signup" to="/login/signup" />
     </Router>
   );

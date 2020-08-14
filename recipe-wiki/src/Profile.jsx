@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { Router, navigate } from "@reach/router";
 import {
@@ -23,6 +23,10 @@ const Profile = ({ onSave }) => {
       id: chefid.currentUserID,
     },
   });
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   if (loading) {
     console.log("loading");

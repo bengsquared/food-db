@@ -1,0 +1,146 @@
+type Recipe @collection(name: "recipes") {
+  ingredients: [IngredientEntry!] @relation
+  title: String!
+  chef: Chef! 
+  description: String
+  instructions: String
+  time: Int
+  image: String
+  public: Boolean
+}
+
+type IngredientEntry @collection(name: "ingrediententries") {
+  ingredient: Ingredient!
+  recipe: Recipe!
+  name: String!
+  amount: String
+  notes: String
+  order: Int
+}
+
+type Ingredient @collection(name: "ingredients") {
+  name: String! @unique
+}
+
+
+input ChefInput {
+  username: String!
+  name: String
+  bio: String
+  image: String
+}
+
+type Chef @collection(name: "chefs") {
+  username: String! @unique
+  name: String
+  recipes: [Recipe!] @relation
+  bio: String
+  image: String
+}
+
+type Query {
+  myRecipes(filter: FilterInput):[Recipe!] @resolver(name: "search_recipes")
+  allIngredients: [Ingredient!]! @index(name: "all_ingredients")
+  findChefByUsername(username: String!): Chef! @index(name: "find_chef_by_username")
+  me: Chef! @resolver(name: "Identity")
+}
+
+input FilterInput {
+  chefid: ID
+  searchterm: String
+  maxtime: Int
+}
+
+input IngredientInput {
+  name: String!
+}
+
+
+input ChefRecipesRelation {
+  create: [RecipeInput]
+  connect: [ID]
+  disconnect: [ID]
+}
+
+
+input RecipeChefRelation {
+  create: ChefInput
+  connect: ID
+}
+
+input RecipeIngredientsRelation {
+  create: [IngredientEntryInput]
+  connect: [ID]
+  disconnect: [ID]
+}
+
+input RecipeInput {
+  ingredients: RecipeIngredientsRelation
+  title: String!
+  chef: RecipeChefRelation
+  description: String
+  instructions: String
+  time: Int
+  image: String
+  public: Boolean
+}
+
+input NewRecipeInput {
+  ingredients: [UpdateIngredientEntryInput!]
+  title: String!
+  chef: RecipeChefRelation
+  description: String
+  instructions: String
+  time: Int
+  image: String
+  public: Boolean
+}
+
+type Mutation {
+  logoutChef:Boolean! @resolver(name:"logout_chef")
+  newRecipe(input: NewRecipeInput): ID! @resolver(name: "create_recipe")
+  createChef(input: CreateChefInput): Chef! @resolver(name: "create_chef")
+  loginChef(input: LoginChefInput): String! @resolver(name: "login_chef")
+  batchDeleteRecipeIngredients(input:[ID!]): Boolean!  @resolver(name: "batch_delete_recipe_ingredients")
+  batchUpdateRecipeIngredients(input:[UpdateIngredientEntryInput!]): [IngredientEntry] @resolver(name:"batch_update_recipe_ingredients")
+}
+
+input UpdateIngredientEntryInput {
+  id: ID!
+  ingredientid: ID!
+  name: String!
+  amount: String!
+  order: Int
+  notes: String!
+  recipeid: ID!
+}
+
+input IngredientEntryInput {
+  ingredient: IngredientEntryIngredientRelation
+  recipe: IngredientEntryRecipeRelation
+  name: String!
+  amount: String
+  notes: String
+  order: Int
+
+}
+
+input IngredientEntryIngredientRelation {
+  create: IngredientInput
+  connect: ID
+}
+
+input IngredientEntryRecipeRelation {
+  create: RecipeInput
+  connect: ID
+}
+
+input LoginChefInput {
+  username: String!
+  password: String!
+}
+
+input CreateChefInput {
+  username: String!
+  password: String!
+}
