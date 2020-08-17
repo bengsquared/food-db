@@ -10,7 +10,6 @@ import {
   ApolloProvider,
   gql,
 } from "@apollo/client";
-import { defaultToken } from "./constants";
 import { CookiesProvider } from "react-cookie";
 import { typeDefs, resolvers } from "./serverfunctions";
 
@@ -30,7 +29,7 @@ client.writeQuery({
       token @client
     }
   `,
-  data: { isLoggedIn: false, token: defaultToken },
+  data: { isLoggedIn: false, token: process.env.REACT_APP_DEFAULT_TOKEN },
 });
 
 ReactDOM.render(

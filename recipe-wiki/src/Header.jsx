@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { navigate } from "@reach/router";
 import { useCookies } from "react-cookie";
 import { useApolloClient, gql } from "@apollo/client";
-import { defaultToken } from "./constants";
 import { useCurrentToken } from "./serverfunctions";
 
 const Header = () => {
@@ -38,7 +37,7 @@ const Header = () => {
         `,
         data: {
           isLoggedIn: false,
-          token: defaultToken,
+          token: process.env.REACT_APP_DEFAULT_TOKEN,
         },
       });
       navigate("/login");
@@ -83,6 +82,18 @@ const Header = () => {
           }}
         >
           Log out
+        </button>
+        <button
+          onClick={(e) => {
+            setMenuOpen(false);
+            window.scrollTo({ top: 0 });
+            window.open(
+              "https://www.notion.so/RecipeBox-86991e4e1964406d968e74cb85446da2"
+            );
+          }}
+          className=" px-0 py-3 sm:px-3 sm:py-0 funderline"
+        >
+          About
         </button>
         <button
           name="Profile"

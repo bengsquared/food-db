@@ -5,7 +5,6 @@ import Header from "./Header";
 import "./assets/main.css";
 import "./assets/tailwind.css";
 import { useCookies } from "react-cookie";
-import { defaultToken } from "./constants";
 import { Router, Redirect } from "@reach/router";
 import {
   useLoginStatus,
@@ -28,7 +27,8 @@ const Main = ({ navigate }) => {
   ]);
   if (
     !(loggedin || { isLoggedIn: false }).isLoggedIn ||
-    (token.token || defaultToken) === defaultToken ||
+    (token.token || process.env.REACT_APP_DEFAULT_TOKEN) ===
+      process.env.REACT_APP_DEFAULT_TOKEN ||
     !chef.currentUserID
   ) {
     removeCookie("userToken", { path: "/" });
@@ -43,7 +43,7 @@ const Main = ({ navigate }) => {
       `,
       data: {
         isLoggedIn: false,
-        token: defaultToken,
+        token: process.env.REACT_APP_DEFAULT_TOKEN,
         currentUserID: null,
       },
     });
@@ -82,7 +82,7 @@ const Main = ({ navigate }) => {
             `,
             data: {
               isLoggedIn: false,
-              token: defaultToken,
+              token: process.env.REACT_APP_DEFAULT_TOKEN,
               currentUserID: null,
             },
           });

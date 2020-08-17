@@ -1,5 +1,5 @@
 import { useQuery, gql } from "@apollo/client";
-import { defaultToken } from "./constants";
+
 export const typeDefs = gql`
   extend type Query {
     isLoggedIn: Boolean!
@@ -238,7 +238,7 @@ export function useCurrentChefId() {
 export function useCurrentToken() {
   const { data } = useQuery(GET_CURRENT_TOKEN);
   if (!(data || { token: null }).token) {
-    return defaultToken;
+    return process.env.REACT_APP_DEFAULT_TOKEN;
   } else {
     return data;
   }

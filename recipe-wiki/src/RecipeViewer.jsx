@@ -31,16 +31,17 @@ const RecipeViewer = ({ recipe, closeRecipe, setEditing }) => {
     html2canvas: {
       useCORS: true,
       allowTaint: true,
+      imageTimeout: 0,
       scale: 4,
       windowWidth: 769,
       x: 0,
+      logging: true,
       y: 0,
       scrollX: 0,
       scrollY: 0,
     },
     jsPDF: {
       format: "letter",
-      orientation: "portrait",
     },
   };
 

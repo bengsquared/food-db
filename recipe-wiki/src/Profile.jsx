@@ -7,6 +7,7 @@ import {
   GET_CHEF_PROFILE,
   UPDATE_CHEF,
 } from "./serverfunctions";
+import ImageUpload from "./ImageUpload";
 
 const Profile = ({ onSave }) => {
   const token = useCurrentToken();
@@ -85,6 +86,10 @@ const EditProfile = ({ chef, setEditing }) => {
     e.preventDefault();
   };
 
+  const setImageUrl = (url) => {
+    setNewChef({ ...newChef, image: url });
+  };
+
   return (
     <div className="pb-10">
       <img
@@ -96,17 +101,11 @@ const EditProfile = ({ chef, setEditing }) => {
         }
         alt="profile avatar"
       ></img>
-      <div className="w-2/3 mx-auto mb-8 text-xs ">
-        {"paste a link to change your picture: "}
-        <div className="funderline inline-block">
-          <input
-            name="image"
-            className="w-full"
-            maxLength="600"
-            value={!!newChef.image ? newChef.image : ""}
-            onChange={handleChange}
-          ></input>
-        </div>
+      <div className="w-2/3 mx-auto mb-8 text-xs flex justify-center">
+        <ImageUpload
+          setImageUrl={setImageUrl}
+          url={!!newChef.image ? newChef.image : ""}
+        />
       </div>
 
       <div className="mx-auto content-left flex-grow w-2/3 text-gray-600">
