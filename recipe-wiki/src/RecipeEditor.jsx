@@ -11,6 +11,7 @@ import {
 import { navigate } from "@reach/router";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import IngredientEditEntry from "./IngredientEditEntry";
+import ImageUpload from "./ImageUpload";
 
 const RecipeEditor = ({
   recipe,
@@ -121,8 +122,10 @@ const RecipeEditor = ({
     window.scrollTo(0, 0);
   }, []);
 
-  if (chef.currentUserID !== recipe.chef._id) {
-    navigate(`/recipes/browse/${recipe._id}`);
+  if (recipe._id !== "new") {
+    if (chef.currentUserID !== recipe.chef._id) {
+      navigate(`/recipes/browse/${recipe._id}`);
+    }
   }
 
   const handleChange = (e) => {
@@ -158,6 +161,10 @@ const RecipeEditor = ({
       e.persist();
       setEditedRecipe({ ...editedRecipe, public: e.target.checked });
     }
+  };
+
+  const setImageUrl = (url) => {
+    setEditedRecipe({ ...editedRecipe, image: url });
   };
 
   const del = (e) => {
@@ -337,17 +344,8 @@ const RecipeEditor = ({
         </div>
       </div>
       <div className="col-span-12 grid grid-cols-2 md:col-span-4">
-        <div className="col-span-2 flex p-2 m-2">
-          <label className="flex-none w-auto">{"image url: "}</label>
-          <div className="flex-grow funderline">
-            <input
-              name="image"
-              className="w-full"
-              placeholder="www.cdn.com/my-image"
-              value={editedRecipe.image || ""}
-              onChange={handleChange}
-            ></input>
-          </div>
+        <div className="col-span-2 flex p-2 m-2 mt-0">
+          <ImageUpload setImageUrl={setImageUrl} url={editedRecipe.image} />
         </div>
         <div className="col-span-2 h-64 text-center">
           {foodemoji.includes(editedRecipe.image) ? (

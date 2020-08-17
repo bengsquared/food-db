@@ -8,7 +8,6 @@ import {
   useCurrentChefId,
   recipeTemplate,
 } from "./serverfunctions";
-import { defaultToken } from "./constants.js";
 
 const ShareRecipe = ({ id }) => {
   console.log("share");

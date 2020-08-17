@@ -3,7 +3,6 @@ import Main from "./Main";
 import Login from "./Login";
 import ShareRecipe from "./ShareRecipe";
 import { useApolloClient, gql } from "@apollo/client";
-import { defaultToken } from "./constants";
 import { Router, navigate, Redirect } from "@reach/router";
 import { useCookies } from "react-cookie";
 import { GET_CHEF_FULL_ON_LOGIN } from "./serverfunctions";
@@ -15,7 +14,7 @@ const App = () => {
   ]);
   const client = useApolloClient();
 
-  let cookieToken = defaultToken;
+  let cookieToken = process.env.REACT_APP_DEFAULT_TOKEN;
   if (cookies && cookies.userToken && cookies.currentUserID) {
     cookieToken = cookies.userToken;
     client.writeQuery({
