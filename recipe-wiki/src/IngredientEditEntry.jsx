@@ -50,10 +50,11 @@ const IngredientEditEntry = React.forwardRef((props, ref) => {
             src={handle}
           ></img>
           <label className="sm:hidden">amount:</label>
-          <div className="inline funderline overflow-hidden">
+          <div className="funderline overflow-hidden">
             <input
               placeholder="2 cups"
               name="amount"
+              className="overflow-hidden"
               ref={ref}
               value={ingredient.amount || ""}
               onBlur={() => {

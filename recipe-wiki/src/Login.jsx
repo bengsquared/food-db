@@ -31,6 +31,7 @@ const Login = ({ onLogin, navigate }) => {
       <Router className="w-full min-h-screen flex justify-center">
         <LoginScreen path="/" onLogin={onLogin} />
         <SignUpScreen path="/signup" onLogin={onLogin} />
+        <PasswordReset path="/password-reset" />
       </Router>
     </div>
   );
@@ -165,13 +166,16 @@ const SignUpScreen = ({ onLogin, navigate }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const token = useCurrentToken();
+  const [newUser, setNewUser] = useState(null);
+  const [email, setEmail] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [passwordMessage, setPasswordMessage] = useState("secret passphrase:");
   const [login, { loading, error }] = useMutation(LOGIN_USER, {
     onCompleted(res) {
-      onLogin(res.loginChef, true);
+      setNewUser(res.loginChef);
     },
   });
+
   const [createChef, { loading2, error2 }] = useMutation(SIGNUP_USER, {
     onCompleted({ createChef }) {
       login({
@@ -203,6 +207,8 @@ const SignUpScreen = ({ onLogin, navigate }) => {
       setUsername(e.target.value);
     } else if (e.target.name === "password") {
       setPassword(e.target.value);
+    } else if (e.target.name === "email") {
+      setEmail(e.target.value);
     }
     e.preventDefault();
   };
@@ -245,78 +251,129 @@ const SignUpScreen = ({ onLogin, navigate }) => {
     }
   };
 
+  const submitEmail = () => {
+    if (email === null) {
+      onLogin(newUser, true);
+    } else {
+      if (email.match(/(.*)@(.*).(.*)/g) !== null) {
+        fetch("https://" + window.location.hostname + "/api/password-reset", {
+          method: "POST",
+          mode: "same-origin",
+          cache: "no-cache",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          redirect: "follow", // manual, *follow, error
+          referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+          body: JSON.stringify({ email: email }), // body data type must match "Content-Type" header
+        }).then((res) => {});
+      } else {
+        setErrorMessage("not a valid email format");
+      }
+    }
+  };
+
   return (
     <div className="w-full h-screen sm:h-auto sm:w-auto sm:max-w-md sm:-mt-48 p-12 flex flex-col self-center bg-white overflow-hidden items-center shadow-lg">
       <div className="m-1 text-3xl p-1">recipebox</div>
-      <form>
-        <p className={!!errorMessage ? "text-red-700" : ""}>
-          {errorMessage ||
-            "all right, let's get started! What's your unique Chef Name?"}
-          <br />
-        </p>
-        <div className="block p-2 funderline">
-          <input
-            id="username"
-            name="username"
-            size="10"
-            maxLength="100"
-            className="w-full"
-            placeholder="username"
-            value={username}
-            onChange={handleChange}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                pref.current.focus();
+      {!!newUser ? (
+        <div>
+          <form>
+            {}"You can optionally provide an email to recover your password.
+            Recipebox will not use this for anything else, and will NOT send you
+            any other messages "}
+            {errorMessage}
+            <div className="block p-2 funderline">
+              <input
+                id="email"
+                name="email"
+                size="10"
+                maxLength="100"
+                className="w-full"
+                placeholder="reset email"
+                value={email}
+                onChange={handleChange}
+              />
+            </div>
+          </form>
+          <button onClick={submitEmail}></button>
+        </div>
+      ) : (
+        <div>
+          <form>
+            <p className={!!errorMessage ? "text-red-700" : ""}>
+              {errorMessage ||
+                "all right, let's get started! What's your unique Chef Name?"}
+              <br />
+            </p>
+            <div className="block p-2 funderline">
+              <input
+                id="username"
+                name="username"
+                size="10"
+                maxLength="100"
+                className="w-full"
+                placeholder="username"
+                value={username}
+                onChange={handleChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    pref.current.focus();
+                  }
+                }}
+              />
+            </div>
+            <p
+              className={
+                passwordMessage === "secret passphrase:" ? "" : "text-red-700"
               }
-            }}
-          />
+            >
+              <br />
+              {passwordMessage}
+              <br />
+              <span className="text-xs">
+                (more than 8 characters, please!){" "}
+              </span>
+              <br />
+            </p>
+            <div className="block p-2 funderline">
+              <input
+                id="cred"
+                className="w-full"
+                ref={pref}
+                maxLength="100"
+                name="password"
+                size="10"
+                type="password"
+                placeholder="password"
+                value={password}
+                onChange={handleChange}
+                onKeyDown={enter}
+              />
+            </div>
+          </form>
+          <button
+            name="submit"
+            className="self-center funderline py-1 px-2 my-6 bg-green-200 border rounded"
+            onClick={signupValidator}
+          >
+            sign up!
+          </button>
+          <p className="text-xs">
+            {"if you realized you really do have a box already, you can "}
+            <button
+              name="back"
+              className="inline funderline"
+              onClick={() => {
+                navigate("/login");
+              }}
+            >
+              {"go back to login here"}
+            </button>
+          </p>
         </div>
-        <p
-          className={
-            passwordMessage === "secret passphrase:" ? "" : "text-red-700"
-          }
-        >
-          <br />
-          {passwordMessage}
-          <br />
-          <span className="text-xs">(more than 8 characters, please!) </span>
-          <br />
-        </p>
-        <div className="block p-2 funderline">
-          <input
-            id="cred"
-            className="w-full"
-            ref={pref}
-            maxLength="100"
-            name="password"
-            size="10"
-            type="password"
-            placeholder="password"
-            value={password}
-            onChange={handleChange}
-            onKeyDown={enter}
-          />
-        </div>
-      </form>
-      <button
-        name="submit"
-        className="self-center funderline py-1 px-2 my-6 bg-green-200 border rounded"
-        onClick={signupValidator}
-      >
-        sign up!
-      </button>
-      <p className="text-xs">
-        {"if you realized you really do have a box already, you can "}
-        <button
-          name="back"
-          className="inline funderline"
-          onClick={() => {
-            navigate("/login");
-          }}
-        >
-          {"go back to login here"}
-        </button>
-      </p>
+      )}
     </div>
   );
 };

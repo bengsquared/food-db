@@ -18,6 +18,12 @@ type IngredientEntry @collection(name: "ingrediententries") {
   order: Int
 }
 
+type ChefEmail {
+  chefid: String
+  email: String
+  token: String
+}
+
 type Ingredient @collection(name: "ingredients") {
   name: String! @unique
 }
@@ -43,6 +49,9 @@ type Query {
   allIngredients: [Ingredient!]! @index(name: "all_ingredients")
   findChefByUsername(username: String!): Chef! @index(name: "find_chef_by_username")
   me: Chef! @resolver(name: "Identity")
+  findChefEmailByRecoveryToken(token: String!): ChefEmail @index(name: "find_chef_email_by_token")
+  findChefEmailByEmail(email: String!): ChefEmail @index(name: "find_chef_email_by_email")
+  findChefEmailByChefId(chefid: String!): ChefEmail @index(name: "find_chef_email_by_chef_id")
 }
 
 input FilterInput {
@@ -144,3 +153,6 @@ input CreateChefInput {
   username: String!
   password: String!
 }
+
+
+
