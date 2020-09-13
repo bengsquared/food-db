@@ -1,10 +1,10 @@
 body {
-  font-family: monospace, monospace; /* 1 */
+  font-family: "Space Mono", monospace; /* 1 */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family: "Space Mono", source-code-pro, Menlo, Monaco, Consolas,
+    "Courier New", monospace;
 }
