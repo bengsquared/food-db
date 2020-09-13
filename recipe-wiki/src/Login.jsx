@@ -25,10 +25,10 @@ const Login = ({ onLogin, navigate }) => {
   }
   return (
     <div
-      className="min-h-screen w-full items-center bg-cover flex bg-local"
+      className="min-h-screen w-full items-center bg-cover flex bg-local items-stretch"
       style={{ backgroundImage: `url(${background})` }}
     >
-      <div className="hidden md:block flex-grow justify-center align-center p-10">
+      <div className="hidden mt-10 lg:mt-32 md:block flex-grow justify-center align-center p-10">
         <div className="text-lg font-bold mb-10 p-4 border-2 border-black ">
           recipebox
         </div>
@@ -50,7 +50,7 @@ const Login = ({ onLogin, navigate }) => {
           </a>
         </div>
       </div>
-      <div className="min-h-screen h-full w-full md:w-auto md:flex-none justify-center bg-white align-center shadow-xl">
+      <div className="w-full md:w-auto md:flex-none justify-center bg-white align-center shadow-xl">
         <Router className="h-full w-full flex justify-center ">
           <LoginScreen path="/" onLogin={onLogin} />
           <SignUpScreen path="/signup" onLogin={onLogin} />
