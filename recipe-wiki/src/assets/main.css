@@ -577,6 +577,8 @@ video {
   height: auto;
 }
 
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
 .funderline:after {
   display: block;
   content: "";
@@ -644,7 +646,7 @@ textarea:focus {
 
 pre {
   font-size: 1rem;
-  font-family: monospace, monospace; /* 1 */
+  font-family: "Space Mono", monospace; /* 1 */
   overflow-x: auto;
   white-space: pre-wrap;
   white-space: -moz-pre-wrap;
