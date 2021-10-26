@@ -36,7 +36,7 @@ const Login = ({ onLogin, navigate }) => {
           one place for all your secret (and not-so-secret) recipes
         </div>
         <div className="text-md">
-          recipebox is a site for the common chef to build and manage their
+          recipebox is a site for the everyday chef to build and manage their
           personal recipe collection. All recipes are private by default, and
           can be downloaded, shared, un-shared, or deleted on demand.
           <br />
